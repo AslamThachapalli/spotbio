@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Mulish } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "sonner";
+import "./globals.css";
+import Providers from "./providers";
 
 const mulish = Mulish({
   subsets: ['latin'],
@@ -19,12 +20,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <body
         className={`${mulish.variable} font-mulish antialiased`}
+        suppressHydrationWarning={true}
       >
-        {children}
-        <Toaster richColors/>
+        <Providers>
+          {children}
+          <Toaster richColors />
+        </Providers>
       </body>
     </html>
   );
