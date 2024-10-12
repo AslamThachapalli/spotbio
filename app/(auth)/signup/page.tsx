@@ -2,7 +2,7 @@
 
 import { createUser, isUsernameAvailable } from "@/app/actions/auth";
 import clsx from "clsx";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react"
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
@@ -83,7 +83,7 @@ export default function SignUp() {
 
         toast.dismiss(loadId)
         if (!res.error) {
-            router.push('/');
+            router.push('/dashboard');
             toast.success('Signed In')
         } else {
             toast.error(res.error)

@@ -62,7 +62,7 @@ export default function Signin() {
 
         toast.dismiss(toastId);
         if (!res?.error) {
-            router.push('/');
+            router.push('/dashboard');
             toast.success('Signed In');
         } else {
             if (res.status === 401) {
