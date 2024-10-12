@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        mulish: ['var(--font-mulish)']
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
