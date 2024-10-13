@@ -8,7 +8,7 @@ export default function AuthHeader() {
     const router = useRouter()
 
     return (
-        <div className="w-screen h-12 border-b-[1px] flex items-center bg-white">
+        <div className="w-screen h-16 border-b-[1px] flex items-center bg-white">
             <div className="max-width w-full mx-auto flex justify-between">
                 <p>Spotbio</p>
 
