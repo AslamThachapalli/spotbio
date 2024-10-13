@@ -1,6 +1,6 @@
 'use client'
 
-import { createUser, isUsernameAvailable } from "@/app/actions/auth";
+import { createUser, isUsernameAvailable } from "@/actions/auth";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState } from "react"
