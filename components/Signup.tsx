@@ -1,8 +1,9 @@
 'use client'
 
-import { createUser, isUsernameAvailable } from "@/actions/auth";
+import { createUser } from "@/actions/auth";
 import { InputValidationType, validateEmail, validatePassword, validateUsername } from "@/lib/validations";
 import clsx from "clsx";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react"
 import { FaEye } from "react-icons/fa";
@@ -104,11 +105,18 @@ function Signup() {
 
         const res = await createUser(form);
 
-        toast.dismiss(loadId)
         if (!res.error) {
+            await signIn('credentials', {
+                username: form.username,
+                password: form.password,
+                redirect: false,
+            })
+
+            toast.dismiss(loadId)
             router.push('/dashboard');
-            toast.success('Signed In')
+            toast.success('Account created!')
         } else {
+            toast.dismiss(loadId)
             toast.error(res.error)
         }
     }
