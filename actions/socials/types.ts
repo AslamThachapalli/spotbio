@@ -1,12 +1,12 @@
 import { ReturnTypeWrapper } from "@/lib/return-type";
 import { Social } from "@prisma/client";
 
-type SocialType = {
+export type SocialType = {
     id?: number;
     platformId: number;
     link: string;
     position: number;
 }
 
-type ReturnTypeCreateSocial = ReturnTypeWrapper<SocialType, Social>
-type ReturnTypeUpdateSocial = ReturnTypeCreateSocial
+export type ReturnTypeCreateSocial = ReturnTypeWrapper<SocialType, Social>
+export type ReturnTypeUpdateSocial = ReturnTypeCreateSocial

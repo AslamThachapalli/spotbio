@@ -1,6 +1,124 @@
 'use server'
 
-import  db  from "@/db";
-import { ReturnTypeWrapper } from "@/lib/return-type";
-import { Social } from "@prisma/client";
+import db from "@/db";
+import { ReturnTypeCreateSocial, ReturnTypeUpdateSocial, SocialType } from "./types";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { SocialPlatform } from "@prisma/client";
 
+export const getSocialPlatforms = async (): Promise<SocialPlatform[]> => {
+    try {
+        const socialPlatforms = await db.socialPlatform.findMany()
+        return socialPlatforms
+    } catch (e: any) {
+        return []
+    }
+}
+
+export const getSocials = async (): Promise<{socials: SocialType[], maxPosition: number}> => {
+    try {
+        const session = await getServerSession(authOptions)
+        const userId = Number(session?.user?.id)
+        if (!userId) {
+            return {
+                socials: [],
+                maxPosition: 0
+            }
+        }
+
+        const socials = await db.social.findMany({
+            where: {
+                userId
+            },
+            orderBy: {
+                position: 'asc'
+            }
+        })
+        
+        return {
+            socials,
+            maxPosition: socials.reduce((max, social) => Math.max(max, social.position), 0)
+        }
+    } catch (e: any) {
+        return {
+            socials: [],
+            maxPosition: 0
+        }       
+    }
+}
+
+export const createSocial = async (social: SocialType): Promise<ReturnTypeCreateSocial> => {
+    try {
+        const session = await getServerSession(authOptions)
+        const userId = Number(session?.user?.id)
+        if (!userId) {
+            return {
+                error: "Unauthorized"
+            }
+        }
+
+        const newSocial = await db.social.create({
+            data: {
+                ...social,
+                userId: 1
+            }
+        })
+
+        return {
+            data: newSocial
+        }
+    } catch (e: any) {
+        return {
+            error: e.message || "Error creating social",
+        }
+    }
+}
+
+export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdateSocial> => {
+    try {
+        const session = await getServerSession(authOptions)
+        const userId = Number(session?.user?.id)
+        if (!userId) {
+            return {
+                error: "Unauthorized"
+            }
+        }
+
+        const updatedSocial = await db.social.update({
+            where: {
+                id: social.id,
+                userId
+            },
+            data: social
+        })
+
+        return {
+            data: updatedSocial
+        }
+    } catch (e: any) {
+        return {
+            error: e.message || "Error updating social",
+        }
+    }
+}
+
+export const deleteSocial = async (id: number): Promise<boolean> => {
+    try {
+        const session = await getServerSession(authOptions)
+        const userId = Number(session?.user?.id)
+        if (!userId) {
+            false
+        }
+
+        await db.social.delete({
+            where: {
+                id,
+                userId
+            }
+        })
+
+        return true
+    } catch (e: any) {
+        return false
+    }
+}
