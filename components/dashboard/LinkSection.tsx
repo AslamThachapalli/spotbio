@@ -1,8 +1,8 @@
 'use client'
 
-import { LinkType } from "@/actions/links/types"
+import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "@/actions/links/types"
 import { useState, useEffect } from "react"
-import { createLink, getLinks } from "@/actions/links"
+import { createLink, deleteLink, getLinks, updateLink } from "@/actions/links"
 import LinksList from "./LinkList"
 import { AddLinkDialog } from "./AddLinkDialog"
 import { toast } from "sonner"
@@ -11,6 +11,7 @@ export default function LinkSection() {
     const [showDialog, setShowDialog] = useState(false)
     const [links, setLinks] = useState<LinkType[]>([])
     const [maxPosition, setMaxPosition] = useState(0)
+    const [linkToEdit, setLinkToEdit] = useState<LinkType | null>(null)
 
     useEffect(() => {
         const fetchLinks = async () => {
@@ -23,18 +24,50 @@ export default function LinkSection() {
     }, [])
 
     const handleSave = async (title: string, link: string) => {
-        const newLink = await createLink({ title, link, position: maxPosition + 1 })
-        if (!newLink.error && newLink.data) {
-            setLinks([...links, newLink.data])
-            setMaxPosition(maxPosition + 1)
-        setShowDialog(false)
+        const res = linkToEdit ?
+            await updateLink({
+                ...linkToEdit,
+                title,
+                link,
+            }) :
+            await createLink({ title, link, position: maxPosition + 1 })
+
+        if (!res.error && res.data) {
+            if(linkToEdit) {
+                setLinks(links.map((link) => link.id === linkToEdit.id ? res.data! : link))
+                setLinkToEdit(null)
+                toast.success('Link updated')
+            } else {
+                setLinks([...links, res.data])
+                setMaxPosition(maxPosition + 1)
+                toast.success('Link created')
+            }
+            setShowDialog(false)
         } else {
-            toast.error(newLink.error)
+            toast.error(res.error)
+        }
+    }
+
+    const handleDelete = async (id: number) => {
+        const res = await deleteLink(id)
+        if (res) {
+            setLinks(links.filter((link) => link.id !== id))
+            toast.success('Link deleted')
+            setLinkToEdit(null)
+            setShowDialog(false)
+        } else {
+            toast.error('Failed deleting link')
         }
     }
 
     const handleClose = () => {
         setShowDialog(false)
+        setLinkToEdit(null)
+    }
+
+    const handleTap = (link: LinkType) => {
+        setLinkToEdit(link)
+        setShowDialog(true)
     }
 
     return (
@@ -44,6 +77,8 @@ export default function LinkSection() {
                 <AddLinkDialog
                     onClose={handleClose}
                     onSave={handleSave}
+                    linkToEdit={linkToEdit}
+                    onDelete={handleDelete}
                 />
             }
 
@@ -54,7 +89,7 @@ export default function LinkSection() {
                 Add Link
             </button>
 
-            <LinksList links={links} />
+            <LinksList links={links} onTap={handleTap} />
         </>
     )
 }

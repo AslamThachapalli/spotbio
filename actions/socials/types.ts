@@ -1,5 +1,5 @@
 import { ReturnTypeWrapper } from "@/lib/return-type";
-import { Social } from "@prisma/client";
+import { Social, SocialPlatform } from "@prisma/client";
 
 export type SocialType = {
     id?: number;

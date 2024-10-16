@@ -1,10 +1,17 @@
 'use client'
+
 import MakeDialog from "../Dialog";
 import { useState } from "react";
+import { LinkType } from "@/actions/links/types";
 
-export function AddLinkDialog({ onClose, onSave }: { onClose: () => void, onSave: (title: string, link: string) => void }) {
-    const [title, setTitle] = useState("");
-    const [link, setLink] = useState("");
+export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
+    onClose: () => void,
+    onSave: (title: string, link: string) => void,
+    linkToEdit?: LinkType | null,
+    onDelete: (id: number) => void
+}) {
+    const [title, setTitle] = useState(linkToEdit?.title || "");
+    const [link, setLink] = useState(linkToEdit?.link || "");
 
     const handleSave = () => {
         onSave(title, link)
@@ -44,6 +51,17 @@ export function AddLinkDialog({ onClose, onSave }: { onClose: () => void, onSave
                     onChange={(e) => setLink(e.target.value)}
                     className="w-full p-2 mb-4 border rounded"
                 />
+                {
+                    linkToEdit &&
+                    <div className="flex justify-between items-center mb-4">
+                        <button 
+                            onClick={() => onDelete(linkToEdit.id!)}
+                            className="text-red-500"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                }
                 <button
                     onClick={handleSave}
                     className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"

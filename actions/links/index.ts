@@ -5,8 +5,17 @@ import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "./types"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
+var cachedLinks: LinkType[] | null = null
+
 export const getLinks = async (): Promise<{links: LinkType[], maxPosition: number}> => {
     try {
+        if (cachedLinks) {
+            return {
+                links: cachedLinks,
+                maxPosition: cachedLinks.reduce((max, link) => Math.max(max, link.position), 0)
+            }
+        }
+
         const session = await getServerSession(authOptions)
         const userId = Number(session?.user?.id)
 
@@ -25,6 +34,7 @@ export const getLinks = async (): Promise<{links: LinkType[], maxPosition: numbe
                 position: 'asc'
             }
         })
+        cachedLinks = links
 
         const maxPosition = links.reduce((max, link) => Math.max(max, link.position), 0)
 
@@ -58,6 +68,8 @@ export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> 
             }
         })
 
+        cachedLinks = [...(cachedLinks || []), newLink]
+        
         return {
             data: newLink
         }
@@ -87,6 +99,9 @@ export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> 
             data: link
         })
 
+        cachedLinks = (cachedLinks || []).map((l) => l.id === updatedLink.id ? updatedLink : l)
+        cachedLinks = cachedLinks.sort((a, b) => a.position - b.position)
+
         return {
             data: updatedLink
         }
@@ -114,6 +129,9 @@ export const deleteLink = async (id: number): Promise<boolean> => {
             }
         })
 
+        cachedLinks = (cachedLinks || []).filter((l) => l.id !== id)
+        cachedLinks = cachedLinks.sort((a, b) => a.position - b.position)
+        
         return true
     } catch (e: any) {
         return false

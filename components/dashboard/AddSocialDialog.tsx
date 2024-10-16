@@ -1,19 +1,37 @@
+'use client'
+
 import MakeDialog from "../Dialog";
 import { SocialPlatform } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { getSocialPlatforms } from "@/actions/socials";
+import { SocialType } from "@/actions/socials/types";
 
-export default function AddSocialDialog({ onClose, onSave }: { onClose: () => void, onSave: (link: string, platformId: number) => void }) {
+export default function AddSocialDialog({ onClose, onSave, socialToEdit, onDelete }: { 
+    onClose: () => void, 
+    onSave: (link: string, platformId: number) => void,
+    socialToEdit?: SocialType | null,
+    onDelete: (id: number) => void
+}) {
     const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([])
     const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | null>(null)
-    const [link, setLink] = useState('')
+    const [link, setLink] = useState(socialToEdit?.link || '')
 
     useEffect(() => {
         const fetchSocialPlatforms = async () => {
-            const platforms = await getSocialPlatforms()
+            const platforms = await getSocialPlatforms() as SocialPlatform[]
             setSocialPlatforms(platforms)
         }
 
+        const fetchSelectedPlatform = async () => {
+            if (socialToEdit) {
+                const platform = await getSocialPlatforms(socialToEdit.platformId) as SocialPlatform
+                setSelectedPlatform(platform)
+            }
+        }
+
+        if (socialToEdit) {
+            fetchSelectedPlatform()
+        } 
         fetchSocialPlatforms()
     }, [])
 
@@ -82,6 +100,14 @@ export default function AddSocialDialog({ onClose, onSave }: { onClose: () => vo
                             >
                                 Back
                             </button>
+                            {socialToEdit && (
+                                <button
+                                    onClick={() => onDelete(socialToEdit.id!)}
+                                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                                >
+                                    Delete
+                                </button>
+                            )}
                             <button
                                 onClick={handleSave}
                                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
