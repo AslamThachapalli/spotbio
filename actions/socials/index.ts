@@ -60,7 +60,7 @@ export const createSocial = async (social: SocialType): Promise<ReturnTypeCreate
         const newSocial = await db.social.create({
             data: {
                 ...social,
-                userId: 1
+                userId
             }
         })
 
