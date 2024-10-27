@@ -5,17 +5,19 @@ import { SocialPlatform } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { getSocialPlatforms, getSocials } from "@/actions/socials";
 import { SocialType } from "@/actions/socials/types";
+import Input from "../Input";
 
 export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, onDelete }: {
     onClose: () => void,
-    onSave: (link: string, platformId: number) => void,
+    onSave: (link: string, platformId: string) => void,
     socialToEdit?: SocialType | null,
-    onDelete: (id: number) => void
+    onDelete: (id: string) => void
 }) {
     const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([])
     const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | null>(null)
     const [link, setLink] = useState(socialToEdit?.link || '')
     const [existingSocials, setExistingSocials] = useState<SocialType[]>([])
+    const [error, setError] = useState('')
 
     useEffect(() => {
         const fetchSocialPlatforms = async () => {
@@ -50,6 +52,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
             setLink('')
         }
         setSelectedPlatform(platform)
+        setError('')
     }
 
     const handleBack = () => {
@@ -59,15 +62,31 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
             setSelectedPlatform(null)
             setLink('')
         }
+        setError('')
+    }
+
+    const validateLink = (link: string): boolean => {
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/
+        return urlPattern.test(link)
     }
 
     const handleSave = async () => {
         if (!selectedPlatform) return
 
+        if (!link.trim()) {
+            setError('Link is required')
+            return
+        }
+
+        if (!validateLink(link)) {
+            setError('Please enter a valid URL')
+            return
+        }
+
         onSave(link, selectedPlatform.id)
     }
 
-    const isPlatformInSocials = (platformId: number) => {
+    const isPlatformInSocials = (platformId: string) => {
         return existingSocials.some(social => social.platformId === platformId)
     }
 
@@ -118,22 +137,27 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-2">
-                        <input
-                            type="text"
-                            value={link}
-                            onChange={(e) => setLink(e.target.value)}
-                            placeholder={`Enter ${selectedPlatform.name} link`}
-                            className=" p-2 border rounded m-5"
-                        />
-                        {socialToEdit && (
-                            <button
-                                onClick={() => onDelete(socialToEdit!.id!)}
-                                className="text-red-500 font-semibold tracking-wide mb-3"
-                            >
-                                Remove Icon
-                            </button>
-                        )}
+                    <div>
+                        <div className="flex flex-col gap-2 px-6 py-6">
+                            <Input
+                                value={link}
+                                onChange={(e) => {
+                                    setLink(e.target.value)
+                                    setError('')
+                                }}
+                                placeholder={`Enter ${selectedPlatform.name} link`}
+                            />
+                            {error && <p className="text-red-500 text-sm">{error}</p>}
+                            {socialToEdit && (
+                                <button
+                                    onClick={() => onDelete(socialToEdit!.id!)}
+                                    className="text-red-500 font-semibold tracking-wide mb-3"
+                                >
+                                    Remove Icon
+                                </button>
+                            )}
+                        
+                        </div>
                         <button
                             onClick={handleSave}
                             className="bg-default-gradient text-white px-4 py-2 hover:bg-green-600 w-full font-bold"
@@ -141,6 +165,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                             Save
                         </button>
                     </div>
+
                 )}
 
                 {!selectedPlatform && <div className="sticky bottom-0 right-0 left-0 h-6 bg-white" />}

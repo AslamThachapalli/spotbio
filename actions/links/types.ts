@@ -2,7 +2,7 @@ import { ReturnTypeWrapper } from "@/lib/return-type"
 import { Link } from "@prisma/client"
 
 export type LinkType = {
-    id?: number
+    id?: string
     title: string
     link: string
     position: number

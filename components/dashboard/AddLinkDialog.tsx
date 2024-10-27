@@ -3,20 +3,46 @@
 import MakeDialog from "../Dialog";
 import { useState } from "react";
 import { LinkType } from "@/actions/links/types";
+import Input from "../Input";
 
 export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
     onClose: () => void,
     onSave: (title: string, link: string) => void,
     linkToEdit?: LinkType | null,
-    onDelete: (id: number) => void
+    onDelete: (id: string) => void
 }) {
     const [title, setTitle] = useState(linkToEdit?.title || "");
     const [link, setLink] = useState(linkToEdit?.link || "");
+    const [errors, setErrors] = useState({ title: "", link: "" });
+
+    const validateInputs = () => {
+        let isValid = true;
+        const newErrors = { title: "", link: "" };
+
+        if (!title.trim()) {
+            newErrors.title = "Title is required";
+            isValid = false;
+        }
+
+        if (!link.trim()) {
+            newErrors.link = "Link is required";
+            isValid = false;
+        } else if (!/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/.test(link)) {
+            newErrors.link = "Invalid link";
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
 
     const handleSave = () => {
-        onSave(title, link)
-        setTitle('')
-        setLink('')
+        if (validateInputs()) {
+            onSave(title, link);
+            setTitle('');
+            setLink('');
+            setErrors({ title: "", link: "" });
+        }
     };
 
     return (
@@ -37,22 +63,28 @@ export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
                         </svg>
                     </button>
                 </div>
-                <div className="px-6 py-4 flex flex-col gap-4 mb-4 font-semibold">
-                    <input
-                        type="text"
+                <div className="px-6 py-4 flex flex-col gap-4 mb-4">
+                    <Input
+                        label="Title"
                         placeholder="Enter title"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full p-2 border rounded outline-none bg-[#F3F3F4] hover:bg-[#eaeaeb] focus:bg-white focus:border-[#CF59D8]"
+                        onChange={(e) => {
+                            setTitle(e.target.value)
+                            setErrors({ ...errors, title: "" })
+                        }}
                     />
-                    
-                    <input
-                        type="text"
+                    {errors.title && <p className="text-red-500 text-sm -mt-2">{errors.title}</p>}
+
+                    <Input
+                        label="Link"
                         placeholder="Enter link"
                         value={link}
-                        onChange={(e) => setLink(e.target.value)}
-                        className="w-full p-2 border rounded outline-none bg-[#F3F3F4] hover:bg-[#eaeaeb] focus:bg-white focus:border-[#CF59D8]"
+                        onChange={(e) => {
+                            setLink(e.target.value)
+                            setErrors({ ...errors, link: "" })
+                        }}
                     />
+                    {errors.link && <p className="text-red-500 text-sm -mt-2">{errors.link}</p>}
                     {
                         linkToEdit &&
                         <div className="flex justify-between items-center mt-4 tracking-wider font-semibold">

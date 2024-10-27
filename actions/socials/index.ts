@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { SocialPlatform } from "@prisma/client";
 
 
-export const getSocialPlatforms = async (id?: number): Promise<SocialPlatform | SocialPlatform[]> => {
+export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | SocialPlatform[]> => {
     try {
 
         if (id) {
@@ -32,7 +32,7 @@ export const getSocials = async (): Promise<{socials: SocialType[], maxPosition:
         
 
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
         if (!userId) {
             return {
                 socials: [],
@@ -64,7 +64,7 @@ export const getSocials = async (): Promise<{socials: SocialType[], maxPosition:
 export const createSocial = async (social: SocialType): Promise<ReturnTypeCreateSocial> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
         if (!userId) {
             return {
                 error: "Unauthorized"
@@ -90,7 +90,7 @@ export const createSocial = async (social: SocialType): Promise<ReturnTypeCreate
 export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdateSocial> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
         if (!userId) {
             return {
                 error: "Unauthorized"
@@ -117,10 +117,10 @@ export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdate
     }
 }
 
-export const deleteSocial = async (id: number): Promise<boolean> => {
+export const deleteSocial = async (id: string): Promise<boolean> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
         if (!userId) {
             false
         }

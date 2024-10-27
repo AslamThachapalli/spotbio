@@ -48,7 +48,7 @@ export default function LinkSection() {
         }
     }
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         const res = await deleteLink(id)
         if (res) {
             setLinks(links.filter((link) => link.id !== id))

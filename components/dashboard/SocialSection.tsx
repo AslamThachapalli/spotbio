@@ -23,7 +23,7 @@ export default function SocialSection() {
         fetchSocials()
     }, [])
 
-    const handleSave = async (link: string, platformId: number) => {
+    const handleSave = async (link: string, platformId: string) => {
         const res = socialToEdit ? await updateSocial({
             ...socialToEdit,
             link,
@@ -59,7 +59,7 @@ export default function SocialSection() {
         setShowDialog(true)
     }
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: string) => {
         const res = await deleteSocial(id)
         if (res) {
             setSocials(socials.filter((social) => social.id !== id))

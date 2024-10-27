@@ -17,7 +17,7 @@ export const getLinks = async (): Promise<{links: LinkType[], maxPosition: numbe
         }
 
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
 
         if (!userId) {
             return {
@@ -53,7 +53,7 @@ export const getLinks = async (): Promise<{links: LinkType[], maxPosition: numbe
 export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
 
         if (!userId) {
             return {
@@ -83,7 +83,7 @@ export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> 
 export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
 
         if (!userId) {
             return {
@@ -113,10 +113,10 @@ export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> 
     }
 }
 
-export const deleteLink = async (id: number): Promise<boolean> => {
+export const deleteLink = async (id: string): Promise<boolean> => {
     try {
         const session = await getServerSession(authOptions)
-        const userId = Number(session?.user?.id)
+        const userId = session?.user?.id
 
         if (!userId) {
             return false
