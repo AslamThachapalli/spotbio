@@ -1,6 +1,6 @@
 'use client'
 
-import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "@/actions/links/types"
+import { LinkType } from "@/actions/links/types"
 import { useState, useEffect } from "react"
 import { createLink, deleteLink, getLinks, updateLink } from "@/actions/links"
 import LinksList from "./LinkList"
@@ -33,7 +33,7 @@ export default function LinkSection() {
             await createLink({ title, link, position: maxPosition + 1 })
 
         if (!res.error && res.data) {
-            if(linkToEdit) {
+            if (linkToEdit) {
                 setLinks(links.map((link) => link.id === linkToEdit.id ? res.data! : link))
                 setLinkToEdit(null)
                 toast.success('Link updated')
@@ -83,10 +83,14 @@ export default function LinkSection() {
             }
 
             <button
-                className="bg-pink-300 p-3 w-full"
+                className="bg-default-gradient p-3 w-full flex items-center justify-center gap-2 text-white rounded-md shadow-sm"
                 onClick={() => setShowDialog(true)}
             >
-                Add Link
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+                    <path fillRule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clipRule="evenodd" />
+                </svg>
+
+                <p className="font-bold">Add Link</p>
             </button>
 
             <LinksList links={links} onTap={handleTap} />

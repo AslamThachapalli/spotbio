@@ -16,8 +16,8 @@ export default function LinksList({ links, onTap }:
                             onTap(link)
                         }}
                     >
-                        <h3 className="text-lg font-bold">{link.title}</h3>
-                        <h5 className="text-sm">{link.link}</h5>
+                        <h3 className="text-lg font-bold leading-5">{link.title}</h3>
+                        <h5 className="text-sm font-semibold">{link.link}</h5>
                     </div>
                 ))
             }

@@ -29,3 +29,7 @@ body {
 .max-width {
   @apply max-w-7xl
 }
+
+.bg-default-gradient {
+  @apply bg-gradient-to-r from-[#FD585B] to-[#CF59D8]
+}

@@ -6,17 +6,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SocialPlatform } from "@prisma/client";
 
-var cachedSocialPlatforms: SocialPlatform[] | null = null
-var cachedSocials: SocialType[] | null = null
 
 export const getSocialPlatforms = async (id?: number): Promise<SocialPlatform | SocialPlatform[]> => {
     try {
-        if (cachedSocialPlatforms) {
-            if (id) {
-                return cachedSocialPlatforms.find((p) => p.id === id)!
-            }
-            return cachedSocialPlatforms
-        } 
 
         if (id) {
             const socialPlatform = await db.socialPlatform.findUnique({
@@ -26,9 +18,8 @@ export const getSocialPlatforms = async (id?: number): Promise<SocialPlatform | 
             })
             return socialPlatform!
         }
-        
+
         const socialPlatforms = await db.socialPlatform.findMany()
-        cachedSocialPlatforms = socialPlatforms
         
         return socialPlatforms
     } catch (e: any) {
@@ -38,12 +29,7 @@ export const getSocialPlatforms = async (id?: number): Promise<SocialPlatform | 
 
 export const getSocials = async (): Promise<{socials: SocialType[], maxPosition: number}> => {
     try {
-        if (cachedSocials) {
-            return {
-                socials: cachedSocials,
-                maxPosition: cachedSocials.reduce((max, social) => Math.max(max, social.position), 0)
-            }
-        }
+        
 
         const session = await getServerSession(authOptions)
         const userId = Number(session?.user?.id)
@@ -62,7 +48,6 @@ export const getSocials = async (): Promise<{socials: SocialType[], maxPosition:
                 position: 'asc'
             }
         })
-        cachedSocials = socials
 
         return {
             socials,
@@ -92,7 +77,6 @@ export const createSocial = async (social: SocialType): Promise<ReturnTypeCreate
                 userId,
             }
         })
-        cachedSocials = [...(cachedSocials || []), newSocial]
         return {
             data: newSocial
         }
@@ -118,10 +102,11 @@ export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdate
                 id: social.id,
                 userId
             },
-            data: social
+            data: {
+               link: social.link,
+               position: social.position,
+            }
         })
-        cachedSocials = (cachedSocials || []).map((s) => s.id === updatedSocial.id ? updatedSocial : s)
-        cachedSocials = cachedSocials.sort((a, b) => a.position - b.position)
         return {
             data: updatedSocial
         }
@@ -146,8 +131,6 @@ export const deleteSocial = async (id: number): Promise<boolean> => {
                 userId
             }
         })
-        cachedSocials = (cachedSocials || []).filter((s) => s.id !== id)
-        cachedSocials = cachedSocials.sort((a, b) => a.position - b.position)
 
         return true
     } catch (e: any) {

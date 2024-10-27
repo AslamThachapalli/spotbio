@@ -33,7 +33,7 @@ function DashboardNavigator() {
                         {
                             pathname === `/dashboard/${tab}` ?
                                 <motion.div
-                                    className="absolute right-0 -bottom-[2px] border h-1 bg-red-300 w-full"
+                                    className="absolute right-0 -bottom-[2px] border h-1 bg-default-gradient w-full"
                                     layoutId="underline"
                                 /> : null
                         }
