@@ -11,11 +11,16 @@ const seedSocialPlatforms = async () => {
         { type: PlatformType.TIKTOK },
         { type: PlatformType.WEBSITE },
         { type: PlatformType.EMAIL },
+        { type: PlatformType.FACEBOOK },
     ]
 
-    await prisma.socialPlatform.createMany({
-        data: socialPlatforms
-    })
+    for (const socialPlatform of socialPlatforms) {
+        await prisma.socialPlatform.upsert({
+            where: { type: socialPlatform.type },
+            update: socialPlatform,
+            create: socialPlatform,
+        })
+    }
 }
 
 const seed = async () => {

@@ -23,6 +23,7 @@ export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | 
         
         return socialPlatforms
     } catch (e: any) {
+        console.error('getSocialPlatforms error', e)
         return []
     }
 }

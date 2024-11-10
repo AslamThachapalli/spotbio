@@ -61,7 +61,7 @@ model Social {
 
 model SocialPlatform {
   id String @id @default(uuid())
-  type PlatformType
+  type PlatformType @unique
   socials Social[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,4 +76,5 @@ enum PlatformType {
   TIKTOK
   WEBSITE
   EMAIL
+  FACEBOOK
 }

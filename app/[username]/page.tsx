@@ -1,6 +1,8 @@
 import { getLinksByUsername } from "@/actions/links"
 import { getProfileByUsername } from "@/actions/profile"
-import { getSocialsByUsername } from "@/actions/socials"
+import { getSocialPlatforms, getSocialsByUsername } from "@/actions/socials"
+import SocialIcon from "@/components/SocialIcon"
+import { SocialPlatform } from "@prisma/client"
 
 import Link from 'next/link'
 
@@ -10,6 +12,11 @@ export default async function HostedPage({params: {username}}: { params: {
     const { data: profile, error } = await getProfileByUsername(username)
     const { socials }  = await getSocialsByUsername(username)
     const { links } = await getLinksByUsername(username)
+    const socialPlatforms : SocialPlatform[] = await getSocialPlatforms() as SocialPlatform[]
+
+    const getPlatformType = (id: string) => {
+        return socialPlatforms.find(platform => platform.id === id)?.type!
+    }
 
     if (error) {
         return <div className="text-center text-red-500 mt-10">Error: {error}</div>
@@ -26,7 +33,11 @@ export default async function HostedPage({params: {username}}: { params: {
                 <div className="flex flex-wrap gap-4">
                     {socials.map(social => (
                         <Link key={social.id} href={social.link} target="_blank">
-                            {social.link}
+                            <SocialIcon 
+                                type={getPlatformType(social.platformId)} 
+                                width="40px" 
+                                height="40px"
+                            />
                         </Link>
                     ))}
                 </div>
