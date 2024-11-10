@@ -29,8 +29,6 @@ export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | 
 
 export const getSocials = async (): Promise<{socials: SocialType[], maxPosition: number}> => {
     try {
-        
-
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
         if (!userId) {
@@ -58,6 +56,30 @@ export const getSocials = async (): Promise<{socials: SocialType[], maxPosition:
             socials: [],
             maxPosition: 0
         }       
+    }
+}
+
+export const getSocialsByUsername = async (username: string): Promise<{socials: SocialType[]}> => {
+    try {
+        const user = await db.user.findUnique({
+            where: { username }
+        })
+
+        if (!user) {
+            return { socials: [] }
+        }
+
+        const socials = await db.social.findMany({
+            where: { userId: user.id },
+            orderBy: {
+                position: 'asc'
+            }
+        })
+
+        return { socials }
+    } catch (e: any) {
+        console.error('getSocialsByUsername error', e)
+        return { socials: [] }
     }
 }
 

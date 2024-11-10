@@ -2,17 +2,17 @@
 
 import { getSocialPlatforms } from "@/actions/socials";
 import { SocialType } from "@/actions/socials/types";
-import { SocialPlatform } from "@prisma/client";
+import { PlatformType, SocialPlatform } from "@prisma/client";
 import { useEffect, useState } from "react";
 
 export default function SocialsList({ socials, onTap }: { socials: SocialType[], onTap: (social: SocialType) => void }) {
-    const [socialData, setSocialData] = useState<Array<SocialType & { platformName: string }>>([])
+    const [socialData, setSocialData] = useState<Array<SocialType & { platformName: PlatformType }>>([])
 
     useEffect(() => {
         const fetchSocialData = async () => {
             const data = await Promise.all(socials.map(async (social) => {
                 const platform = await getSocialPlatforms(social.platformId) as SocialPlatform
-                return { ...social, platformName: platform.name }
+                return { ...social, platformName: platform.type }
             }))
             setSocialData(data)
         }     

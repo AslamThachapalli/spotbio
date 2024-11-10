@@ -1,4 +1,4 @@
-import AuthHeader from "@/components/AuthHeader";
+import AuthHeader from "@/components/auth/AuthHeader";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 

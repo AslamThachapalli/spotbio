@@ -1,11 +1,11 @@
 'use client'
 
-import MakeDialog from "../Dialog";
+import MakeDialog from "../../Dialog";
 import { SocialPlatform } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { getSocialPlatforms, getSocials } from "@/actions/socials";
 import { SocialType } from "@/actions/socials/types";
-import Input from "../Input";
+import Input from "../../Input";
 
 export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, onDelete }: {
     onClose: () => void,
@@ -110,7 +110,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                         </button>
                     }
                     <h3 className="text-lg font-bold text-black flex-grow flex justify-center ">
-                        {selectedPlatform ? `${selectedPlatform.name}` : 'Add Social'}
+                        {selectedPlatform ? `${selectedPlatform.type}` : 'Add Social'}
                     </h3>
                     <button
                         onClick={onClose}
@@ -126,7 +126,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                     <div className="px-6 py-1">
                         {socialPlatforms.map((platform) => (
                             <div key={platform.id} className="flex justify-between items-center mb-2 font-semibold border py-2 px-4 rounded-md">
-                                <span>{platform.name}</span>
+                                <span>{platform.type}</span>
                                 <button
                                     onClick={() => handleAddClick(platform)}
                                     className={isPlatformInSocials(platform.id) ? "text-yellow-500" : "text-blue-500"}
@@ -145,7 +145,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                                     setLink(e.target.value)
                                     setError('')
                                 }}
-                                placeholder={`Enter ${selectedPlatform.name} link`}
+                                placeholder={`Enter ${selectedPlatform.type} link`}
                             />
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             {socialToEdit && (

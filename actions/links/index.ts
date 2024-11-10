@@ -50,6 +50,34 @@ export const getLinks = async (): Promise<{links: LinkType[], maxPosition: numbe
     }
 }
 
+export const getLinksByUsername = async (username: string): Promise<{links: LinkType[]}> => {
+    try {
+        const user = await db.user.findUnique({
+            where: { username }
+        })
+
+        if (!user) {
+            return { links: [] }
+        }
+
+        const links = await db.link.findMany({
+            where: { userId: user.id },
+            orderBy: {
+                position: 'asc'
+            }
+        })
+
+        return {
+            links
+        }
+    } catch (e: any) {
+        console.log('getLinksByUsername error', e)
+        return {
+            links: []
+        }
+    }
+}
+
 export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> => {
     try {
         const session = await getServerSession(authOptions)

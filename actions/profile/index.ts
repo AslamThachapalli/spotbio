@@ -24,6 +24,27 @@ export const getProfile = async (): Promise<ReturnTypeProfile> => {
     }
 }
 
+export const getProfileByUsername = async (username: string): Promise<ReturnTypeProfile> => {
+    try {
+        const user = await db.user.findUnique({
+            where: { username }
+        })
+
+        if (!user) {
+            return { error: "User not found" }
+        }
+
+        const profile = await db.profile.findUnique({
+            where: { userId: user.id }
+        })
+
+        return profile ? { data: profile } : { error: "Profile not found" }
+    } catch (e: any) {
+        console.log('getProfileByUsername error', e)
+        return { error: e.message || 'Failed to get profile' }
+    }
+}
+
 export const createProfile = async (profile: ProfileType): Promise<ReturnTypeProfile> => {
     try {
         const session = await getServerSession(authOptions)

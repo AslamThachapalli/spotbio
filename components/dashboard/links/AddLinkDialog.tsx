@@ -1,9 +1,9 @@
 'use client'
 
-import MakeDialog from "../Dialog";
+import MakeDialog from "../../Dialog";
 import { useState } from "react";
 import { LinkType } from "@/actions/links/types";
-import Input from "../Input";
+import Input from "../../Input";
 
 export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
     onClose: () => void,
