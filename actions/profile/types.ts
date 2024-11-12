@@ -1,10 +1,11 @@
-import { ReturnTypeWrapper } from "@/lib/return-type"
+import { ReturnType } from "@/lib/return-type"
 import { Profile } from "@prisma/client"
 
 export type ProfileType = {
     id?: string
     name: string
     bio: string
+    avatar: File | null
 }
 
-export type ReturnTypeProfile = ReturnTypeWrapper<ProfileType, Profile>
+export type ReturnTypeProfile = ReturnType<Profile>

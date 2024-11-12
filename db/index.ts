@@ -12,6 +12,7 @@ const prismaClientSingleton = () => {
               userId: result.id as string,
               name: '',
               bio: '',
+              avatar: ''
             }
           })
 

@@ -1,4 +1,4 @@
-import { ReturnTypeWrapper } from "@/lib/return-type"
+import { ReturnType } from "@/lib/return-type"
 import { User } from "@prisma/client"
 
 export type UserType = {
@@ -7,4 +7,4 @@ export type UserType = {
     password: string,
 }
 
-export type ReturnTypeCreateUser = ReturnTypeWrapper<UserType, User>
+export type ReturnTypeCreateUser = ReturnType<UserType, User>

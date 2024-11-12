@@ -2,6 +2,7 @@
 
 import { getSocialPlatforms } from "@/actions/socials";
 import { SocialType } from "@/actions/socials/types";
+import SocialIcon from "@/components/SocialIcon";
 import { PlatformType, SocialPlatform } from "@prisma/client";
 import { useEffect, useState } from "react";
 
@@ -28,7 +29,10 @@ export default function SocialsList({ socials, onTap }: { socials: SocialType[],
                 className="bg-white px-8 py-4 w-full my-4 rounded-sm shadow-sm flex items-start justify-between cursor-pointer"
                     onClick={() => onTap(social)}
                 >
-                    <p className="font-semibold">{social.platformName}</p>
+                    <p className="font-semibold flex items-center gap-2">
+                        <SocialIcon type={social.platformName}/> 
+                        {social.platformName}
+                    </p>
                     <p className="text-gray-500 font-semibold">{social.link}</p>
                 </div>
             ))}

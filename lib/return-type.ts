@@ -1,4 +1,4 @@
-export type ReturnTypeWrapper<TInput, TOutput> = {
+export type ReturnType<TOutput> = {
     error?: string | null;
     data?: TOutput;
 }

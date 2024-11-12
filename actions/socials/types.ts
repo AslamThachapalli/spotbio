@@ -1,4 +1,4 @@
-import { ReturnTypeWrapper } from "@/lib/return-type";
+import { ReturnType } from "@/lib/return-type";
 import { Social } from "@prisma/client";
 
 export type SocialType = {
@@ -8,5 +8,5 @@ export type SocialType = {
     position: number;
 }
 
-export type ReturnTypeCreateSocial = ReturnTypeWrapper<SocialType, Social>
+export type ReturnTypeCreateSocial = ReturnType<SocialType, Social>
 export type ReturnTypeUpdateSocial = ReturnTypeCreateSocial

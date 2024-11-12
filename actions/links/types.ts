@@ -1,4 +1,4 @@
-import { ReturnTypeWrapper } from "@/lib/return-type"
+import { ReturnType } from "@/lib/return-type"
 import { Link } from "@prisma/client"
 
 export type LinkType = {
@@ -8,6 +8,6 @@ export type LinkType = {
     position: number
 }
 
-export type ReturnTypeCreateLink = ReturnTypeWrapper<LinkType, Link>
+export type ReturnTypeCreateLink = ReturnType<LinkType, Link>
 
 export type ReturnTypeUpdateLink = ReturnTypeCreateLink
