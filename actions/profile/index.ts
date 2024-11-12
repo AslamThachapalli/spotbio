@@ -1,6 +1,6 @@
 'use server'
 
-import db from "@/db"
+import db from "@/client/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { ProfileType, ReturnTypeProfile } from "./types"

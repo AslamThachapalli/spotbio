@@ -1,6 +1,6 @@
 'use server'
 
-import db from "@/db"
+import db from "@/client/db"
 import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "./types"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"

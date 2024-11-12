@@ -1,6 +1,6 @@
 'use server'
 
-import db from '@/db'
+import db from '@/client/db'
 import bcrypt from 'bcrypt';
 import { ReturnTypeCreateUser, UserType } from './types'
 

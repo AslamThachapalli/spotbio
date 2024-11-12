@@ -1,4 +1,4 @@
-import prisma from "../db"
+import prisma from "../client/db"
 import { PlatformType } from "@prisma/client"
 
 const seedSocialPlatforms = async () => {

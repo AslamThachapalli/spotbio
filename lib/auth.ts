@@ -1,6 +1,6 @@
 import { NextAuthOptions, User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
-import db from '@/db'
+import db from '@/client/db'
 import bcrypt from 'bcrypt';
 
 interface AuthSession extends Session {

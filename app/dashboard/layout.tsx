@@ -3,6 +3,7 @@ import React from "react";
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import DashboardNavigator from "@/components/dashboard/DashboardNavigator";
+import HostedPreview from "@/components/dashboard/HostedPreview";
 
 export default async function DashLayout({ children }: { children: React.ReactNode }) {
     const session = await getServerSession()
@@ -19,7 +20,9 @@ export default async function DashLayout({ children }: { children: React.ReactNo
 
             <div className="flex">
                 <div className="sticky top-0 flex-[0.45] w-full h-screen bg-white">
-
+                    <div className="h-full overflow-y-auto flex justify-center items-center">
+                        <HostedPreview username={session.user?.name!} />
+                    </div>
                 </div>
 
                 <div className="flex-[0.55] w-full h-full pt-24 px-16 pb-20 flex flex-col gap-6">

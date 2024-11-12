@@ -1,11 +1,10 @@
 'use server'
 
-import db from "@/db";
+import db from "@/client/db";
 import { ReturnTypeCreateSocial, ReturnTypeUpdateSocial, SocialType } from "./types";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SocialPlatform } from "@prisma/client";
-
 
 export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | SocialPlatform[]> => {
     try {
