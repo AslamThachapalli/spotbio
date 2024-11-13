@@ -42,7 +42,7 @@ export const getLinks = async (): Promise<ReturnType<{links: LinkType[], maxPosi
     }
 }
 
-export const getLinksByUsername = async (username: string): Promise<ReturnType<{links: LinkType[]}>> => {
+export const getLinksByUsername = async (username: string): Promise<ReturnType<LinkType[]>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
@@ -62,9 +62,7 @@ export const getLinksByUsername = async (username: string): Promise<ReturnType<{
         })
 
         return {
-            data: {
-                links
-            }
+            data: links
         }
     } catch (e: any) {
         console.log('getLinksByUsername error', e)

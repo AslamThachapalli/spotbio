@@ -3,7 +3,7 @@
 import db from "@/client/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { ProfileType, ReturnTypeProfile } from "./types"
+import { ReturnTypeProfile } from "./types"
 import { getDownloadURL, uploadBytes } from "firebase/storage"
 import { ref } from "firebase/storage"
 import { storage } from "@/lib/firebase"
@@ -72,7 +72,7 @@ export const createProfile = async (formData: FormData): Promise<ReturnTypeProfi
             return { error: "Unauthorized" }
         }
 
-        let avatarUrl: string | null = null
+        let avatarUrl: string
 
         if (formData.get('avatar')) {
             const result = await uploadAvatar(formData.get('avatar') as File)
@@ -81,12 +81,14 @@ export const createProfile = async (formData: FormData): Promise<ReturnTypeProfi
             } else {
                 return { error: result.error }
             }
+        } else {
+            return { error: "Avatar is required" }
         }
 
         const newProfile = await db.profile.create({
             data: {
                 userId,
-                avatar: avatarUrl!,
+                avatar: avatarUrl,
                 name: formData.get('name') as string,
                 bio: formData.get('bio') as string
             }
@@ -118,13 +120,18 @@ export const updateProfile = async (formData: FormData): Promise<ReturnTypeProfi
             }
         }
 
+        const updateData: any = {
+            name: formData.get('name') as string,
+            bio: formData.get('bio') as string
+        };
+
+        if (avatarUrl) {
+            updateData.avatar = avatarUrl;
+        }
+
         const updatedProfile = await db.profile.update({
             where: { userId },
-            data: {
-                avatar: avatarUrl!,
-                name: formData.get('name') as string,
-                bio: formData.get('bio') as string
-            }
+            data: updateData
         })
 
         return { data: updatedProfile }

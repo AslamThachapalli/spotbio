@@ -9,7 +9,7 @@ import {
 } from "./types";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import {  SocialPlatform } from "@prisma/client";
+import { SocialPlatform } from "@prisma/client";
 import { ReturnType } from "@/lib/return-type";
 
 export const getSocialPlatforms = async (id?: string): Promise<ReturnType<SocialPlatform | SocialPlatform[]>> => {
@@ -85,7 +85,7 @@ export const getSocials = async (): Promise<ReturnType<{socials: SocialWithPlatf
     }
 }
 
-export const getSocialsByUsername = async (username: string): Promise<ReturnType<{socials: SocialWithPlatform[]}>> => {
+export const getSocialsByUsername = async (username: string): Promise<ReturnType<SocialWithPlatform[]>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
@@ -112,9 +112,7 @@ export const getSocialsByUsername = async (username: string): Promise<ReturnType
         })
 
         return {
-            data: {
-                socials
-            }
+            data: socials
         }
     } catch (e: any) {
         console.error('getSocialsByUsername error', e)

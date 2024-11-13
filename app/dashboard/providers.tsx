@@ -1,4 +1,5 @@
 import { LinkProvider } from "@/contexts/LinkContext";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 import { SocialProvider } from "@/contexts/SocialsContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -6,7 +7,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <>
             <LinkProvider>
                 <SocialProvider>
-                    {children}
+                    <ProfileProvider>
+                        {children}
+                    </ProfileProvider>
                 </SocialProvider>
             </LinkProvider>
         </>
