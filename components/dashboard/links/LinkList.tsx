@@ -1,10 +1,8 @@
-import { LinkType } from "@/actions/links/types";
+import { useLink } from "@/contexts/LinkContext";
 
-export default function LinksList({ links, onTap }:
-    {
-        links: LinkType[],
-        onTap: (link: LinkType) => void
-    }) {
+export default function LinksList() {
+    const { links, handleTap } = useLink()
+
     return (
         <div className="my-10">
             {
@@ -13,7 +11,7 @@ export default function LinksList({ links, onTap }:
                         key={link.id}
                         className="bg-white px-8 py-4 w-full my-4 rounded-sm shadow-sm flex flex-col items-start justify-center cursor-pointer"
                         onClick={() => {
-                            onTap(link)
+                            handleTap(link)
                         }}
                     >
                         <h3 className="text-lg font-bold leading-5">{link.title}</h3>

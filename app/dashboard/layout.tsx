@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import DashboardNavigator from "@/components/dashboard/DashboardNavigator";
 import HostedPreview from "@/components/dashboard/HostedPreview";
+import Providers from "./providers";
 
 export default async function DashLayout({ children }: { children: React.ReactNode }) {
     const session = await getServerSession()
@@ -13,7 +14,7 @@ export default async function DashLayout({ children }: { children: React.ReactNo
     }
 
     return (
-        <>
+        <Providers>
             <div className="fixed top-0 z-10">
                 <DashboardHeader />
             </div>
@@ -32,6 +33,6 @@ export default async function DashLayout({ children }: { children: React.ReactNo
                     </div>
                 </div>
             </div>
-        </>
+        </Providers>
     )
 }

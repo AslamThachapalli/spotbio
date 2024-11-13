@@ -2,15 +2,11 @@
 
 import MakeDialog from "../../Dialog";
 import { useState } from "react";
-import { LinkType } from "@/actions/links/types";
 import Input from "../../Input";
+import { useLink } from "@/contexts/LinkContext";
 
-export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
-    onClose: () => void,
-    onSave: (title: string, link: string) => void,
-    linkToEdit?: LinkType | null,
-    onDelete: (id: string) => void
-}) {
+export function AddLinkDialog() {
+    const { linkToEdit, handleSave: handleSaveLink, handleClose, handleDelete } = useLink()
     const [title, setTitle] = useState(linkToEdit?.title || "");
     const [link, setLink] = useState(linkToEdit?.link || "");
     const [errors, setErrors] = useState({ title: "", link: "" });
@@ -38,16 +34,13 @@ export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
 
     const handleSave = () => {
         if (validateInputs()) {
-            onSave(title, link);
-            setTitle('');
-            setLink('');
-            setErrors({ title: "", link: "" });
+            handleSaveLink(title, link);
         }
     };
 
     return (
         <MakeDialog
-            onClose={onClose}
+            onClose={handleClose}
         >
             <div
                 className="w-96 bg-white rounded-lg shadow-xl"
@@ -55,7 +48,7 @@ export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
                 <div className="flex justify-between items-center mb-4 px-6 py-4 border-b">
                     <h2 className="font-bold">{linkToEdit ? 'Edit Link' : 'Add New Link'}</h2>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="text-gray-500 hover:text-gray-700"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +82,7 @@ export function AddLinkDialog({ onClose, onSave, linkToEdit, onDelete }: {
                         linkToEdit &&
                         <div className="flex justify-between items-center mt-4 tracking-wider font-semibold">
                             <button
-                                onClick={() => onDelete(linkToEdit.id!)}
+                                onClick={() => handleDelete(linkToEdit.id!)}
                                 className="text-red-500"
                             >
                                 Delete

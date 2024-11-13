@@ -6,12 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { SocialPlatform } from "@prisma/client"
 
-import Link from 'next/link'
+import Link from 'next/link'    
 
 export async function HostedPageContent({ username, isPreview = false }: { username: string, isPreview?: boolean }) {
     const { data: profile, error } = await getProfileByUsername(username)
     const { socials } = await getSocialsByUsername(username)
-    const { links } = await getLinksByUsername(username)
+    const { data: links } = await getLinksByUsername(username)
     const socialPlatforms: SocialPlatform[] = await getSocialPlatforms() as SocialPlatform[]
 
     const getPlatformType = (id: string) => {
@@ -82,7 +82,7 @@ export async function HostedPageContent({ username, isPreview = false }: { usern
                     !isPreview && "px-2 sm:px-4",
                     isPreview && "px-2"
                 )}>
-                    {links.map(link => (
+                    {links?.links.map(link => (
                         <li key={link.id} className="border rounded-full shadow-md transition-transform transform hover:scale-105">
                             <Link href={link.link} target="_blank" className="block w-full">
                                 <h3 className={cn(

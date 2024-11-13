@@ -1,36 +1,21 @@
 'use client'
 
-import { getSocialPlatforms } from "@/actions/socials";
-import { SocialType } from "@/actions/socials/types";
 import SocialIcon from "@/components/SocialIcon";
-import { PlatformType, SocialPlatform } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useSocial } from "@/contexts/SocialsContext";
 
-export default function SocialsList({ socials, onTap }: { socials: SocialType[], onTap: (social: SocialType) => void }) {
-    const [socialData, setSocialData] = useState<Array<SocialType & { platformName: PlatformType }>>([])
-
-    useEffect(() => {
-        const fetchSocialData = async () => {
-            const data = await Promise.all(socials.map(async (social) => {
-                const platform = await getSocialPlatforms(social.platformId) as SocialPlatform
-                return { ...social, platformName: platform.type }
-            }))
-            setSocialData(data)
-        }     
-
-        fetchSocialData()
-    }, [socials])
+export default function SocialsList() {
+    const { handleTap, socialData } = useSocial()
 
     return (
         <div className="my-5">
             {socialData.map((social) => (
-                <div 
-                key={social.id} 
-                className="bg-white px-8 py-4 w-full my-4 rounded-sm shadow-sm flex items-start justify-between cursor-pointer"
-                    onClick={() => onTap(social)}
+                <div
+                    key={social.id}
+                    className="bg-white px-8 py-4 w-full my-4 rounded-sm shadow-sm flex items-start justify-between cursor-pointer"
+                    onClick={() => handleTap(social)}
                 >
                     <p className="font-semibold flex items-center gap-2">
-                        <SocialIcon type={social.platformName}/> 
+                        <SocialIcon type={social.platformName} />
                         {social.platformName}
                     </p>
                     <p className="text-gray-500 font-semibold">{social.link}</p>

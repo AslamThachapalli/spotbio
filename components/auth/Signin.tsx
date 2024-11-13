@@ -62,7 +62,7 @@ function Signin() {
 
         toast.dismiss(toastId);
         if (!res?.error) {
-            router.push('/dashboard');
+            router.push('/dashboard/links');
             toast.success('Signed In');
         } else {
             if (res.status === 401) {

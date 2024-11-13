@@ -4,25 +4,17 @@ import db from "@/client/db"
 import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "./types"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { ReturnType } from "@/lib/return-type"
 
-var cachedLinks: LinkType[] | null = null
 
-export const getLinks = async (): Promise<{links: LinkType[], maxPosition: number}> => {
+export const getLinks = async (): Promise<ReturnType<{links: LinkType[], maxPosition: number}>> => {
     try {
-        if (cachedLinks) {
-            return {
-                links: cachedLinks,
-                maxPosition: cachedLinks.reduce((max, link) => Math.max(max, link.position), 0)
-            }
-        }
-
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
         if (!userId) {
             return {
-                links: [],
-                maxPosition: 0
+                error: "Unauthorized"
             }
         }
 
@@ -34,30 +26,32 @@ export const getLinks = async (): Promise<{links: LinkType[], maxPosition: numbe
                 position: 'asc'
             }
         })
-        cachedLinks = links
 
         const maxPosition = links.reduce((max, link) => Math.max(max, link.position), 0)
 
         return {
-            links,
-            maxPosition
+            data: {
+                links,
+                maxPosition
+            }
         }
     } catch (e: any) {
         return {
-            links: [],
-            maxPosition: 0
+            error: e.message || 'Failed fetching links',
         }
     }
 }
 
-export const getLinksByUsername = async (username: string): Promise<{links: LinkType[]}> => {
+export const getLinksByUsername = async (username: string): Promise<ReturnType<{links: LinkType[]}>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
         })
 
         if (!user) {
-            return { links: [] }
+            return {
+                error: "User not found"
+            }
         }
 
         const links = await db.link.findMany({
@@ -68,12 +62,14 @@ export const getLinksByUsername = async (username: string): Promise<{links: Link
         })
 
         return {
-            links
+            data: {
+                links
+            }
         }
     } catch (e: any) {
         console.log('getLinksByUsername error', e)
         return {
-            links: []
+            error: e.message || 'Failed fetching links',
         }
     }
 }
@@ -96,7 +92,6 @@ export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> 
             }
         })
 
-        cachedLinks = [...(cachedLinks || []), newLink]
         
         return {
             data: newLink
@@ -127,9 +122,6 @@ export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> 
             data: link
         })
 
-        cachedLinks = (cachedLinks || []).map((l) => l.id === updatedLink.id ? updatedLink : l)
-        cachedLinks = cachedLinks.sort((a, b) => a.position - b.position)
-
         return {
             data: updatedLink
         }
@@ -141,13 +133,15 @@ export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> 
     }
 }
 
-export const deleteLink = async (id: string): Promise<boolean> => {
+export const deleteLink = async (id: string): Promise<ReturnType<boolean>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
         if (!userId) {
-            return false
+            return {
+                error: "Unauthorized"
+            }
         }
 
         await db.link.delete({
@@ -156,12 +150,13 @@ export const deleteLink = async (id: string): Promise<boolean> => {
                 userId
             }
         })
-
-        cachedLinks = (cachedLinks || []).filter((l) => l.id !== id)
-        cachedLinks = cachedLinks.sort((a, b) => a.position - b.position)
         
-        return true
+        return {
+            data: true
+        }
     } catch (e: any) {
-        return false
+        return {
+            error: e.message || 'Failed deleting link',
+        }
     }
 }

@@ -6,43 +6,21 @@ import { useEffect, useState } from "react";
 import { getSocialPlatforms, getSocials } from "@/actions/socials";
 import { SocialType } from "@/actions/socials/types";
 import Input from "../../Input";
+import { useSocial } from "@/contexts/SocialsContext";
 
-export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, onDelete }: {
-    onClose: () => void,
-    onSave: (link: string, platformId: string) => void,
-    socialToEdit?: SocialType | null,
-    onDelete: (id: string) => void
-}) {
-    const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([])
-    const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | null>(null)
+export default function AddSocialDialog() {
+    const { 
+        handleSave: handleSaveSocial, 
+        handleDelete, 
+        handleClose, 
+        socialToEdit, 
+        existingSocials, 
+        selectedPlatform, 
+        setSelectedPlatform, 
+        socialPlatforms 
+    } = useSocial()
     const [link, setLink] = useState(socialToEdit?.link || '')
-    const [existingSocials, setExistingSocials] = useState<SocialType[]>([])
     const [error, setError] = useState('')
-
-    useEffect(() => {
-        const fetchSocialPlatforms = async () => {
-            const platforms = await getSocialPlatforms() as SocialPlatform[]
-            setSocialPlatforms(platforms)
-        }
-
-        const fetchSelectedPlatform = async () => {
-            if (socialToEdit) {
-                const platform = await getSocialPlatforms(socialToEdit.platformId) as SocialPlatform
-                setSelectedPlatform(platform)
-            }
-        }
-
-        const fetchExistingSocials = async () => {
-            const { socials } = await getSocials()
-            setExistingSocials(socials)
-        }
-
-        if (socialToEdit) {
-            fetchSelectedPlatform()
-        }
-        fetchSocialPlatforms()
-        fetchExistingSocials()
-    }, [])
 
     const handleAddClick = (platform: SocialPlatform) => {
         if (isPlatformInSocials(platform.id)) {
@@ -57,7 +35,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
 
     const handleBack = () => {
         if (socialToEdit) {
-            onClose()
+            handleClose()
         } else {
             setSelectedPlatform(null)
             setLink('')
@@ -83,7 +61,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
             return
         }
 
-        onSave(link, selectedPlatform.id)
+        handleSaveSocial(link, selectedPlatform.id)
     }
 
     const isPlatformInSocials = (platformId: string) => {
@@ -92,7 +70,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
 
     return (
         <MakeDialog
-            onClose={onClose}
+            onClose={handleClose}
         >
             <div
                 className="relative w-96 bg-white rounded-md shadow-lg max-h-96 overflow-y-auto"
@@ -113,7 +91,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                         {selectedPlatform ? `${selectedPlatform.type}` : 'Add Social'}
                     </h3>
                     <button
-                        onClick={onClose}
+                        onClick={handleClose}
                         className="text-gray-500 hover:text-gray-700"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,7 +128,7 @@ export default function AddSocialDialog({ onClose, onSave, socialToEdit = null, 
                             {error && <p className="text-red-500 text-sm">{error}</p>}
                             {socialToEdit && (
                                 <button
-                                    onClick={() => onDelete(socialToEdit!.id!)}
+                                    onClick={() => handleDelete(socialToEdit!.id!)}
                                     className="text-red-500 font-semibold tracking-wide mb-3"
                                 >
                                     Remove Icon

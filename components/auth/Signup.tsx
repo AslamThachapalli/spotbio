@@ -113,7 +113,7 @@ function Signup() {
             })
 
             toast.dismiss(loadId)
-            router.push('/dashboard');
+            router.push('/dashboard/links');
             toast.success('Account created!')
         } else {
             toast.dismiss(loadId)
