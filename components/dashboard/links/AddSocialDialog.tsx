@@ -2,42 +2,31 @@
 
 import MakeDialog from "../../Dialog";
 import { SocialPlatform } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { getSocialPlatforms, getSocials } from "@/actions/socials";
-import { SocialType } from "@/actions/socials/types";
+import { useState } from "react";
 import Input from "../../Input";
 import { useSocial } from "@/contexts/SocialsContext";
 
 export default function AddSocialDialog() {
-    const { 
-        handleSave: handleSaveSocial, 
-        handleDelete, 
-        handleClose, 
-        socialToEdit, 
-        existingSocials, 
-        selectedPlatform, 
-        setSelectedPlatform, 
-        socialPlatforms 
+    const {
+        handleSave: handleSaveSocial,
+        handleDelete,
+        handleCloseDialog,
+        socials,
+        socialToEdit,
+        selectedPlatform,
+        socialPlatforms,
+        handleBack,
+        handleAddOrEditSocial
     } = useSocial()
     const [link, setLink] = useState(socialToEdit?.link || '')
     const [error, setError] = useState('')
 
     const handleAddClick = (platform: SocialPlatform) => {
         if (isPlatformInSocials(platform.id)) {
-            const selectedSocial = existingSocials.find(social => social.platformId === platform.id)
-            setLink(selectedSocial?.link || '')
+            handleAddOrEditSocial(platform, true)
+            setLink(socials.find(social => social.platformId == platform.id)!.link)
         } else {
-            setLink('')
-        }
-        setSelectedPlatform(platform)
-        setError('')
-    }
-
-    const handleBack = () => {
-        if (socialToEdit) {
-            handleClose()
-        } else {
-            setSelectedPlatform(null)
+            handleAddOrEditSocial(platform, false)
             setLink('')
         }
         setError('')
@@ -65,33 +54,30 @@ export default function AddSocialDialog() {
     }
 
     const isPlatformInSocials = (platformId: string) => {
-        return existingSocials.some(social => social.platformId === platformId)
+        return socials.some(social => social.platformId === platformId)
     }
 
     return (
         <MakeDialog
-            onClose={handleClose}
+            onClose={handleCloseDialog}
         >
             <div
                 className="relative w-96 bg-white rounded-md shadow-lg max-h-96 overflow-y-auto"
             >
                 <div className="sticky top-0 right-0 left-0 flex items-center mb-4 px-6 py-3 border-b bg-white">
-                    {
-                        selectedPlatform &&
-                        <button
-                            onClick={handleBack}
-                            className="text-gray-500 hover:text-gray-700"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
-                                <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
-                            </svg>
-                        </button>
-                    }
+                    {(socialToEdit || selectedPlatform) && <button
+                        onClick={handleBack}
+                        className="text-gray-500 hover:text-gray-700"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+                            <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+                        </svg>
+                    </button>}
                     <h3 className="text-lg font-bold text-black flex-grow flex justify-center ">
-                        {selectedPlatform ? `${selectedPlatform.type}` : 'Add Social'}
+                        {!selectedPlatform ? 'Add Social': `${selectedPlatform.type}`}
                     </h3>
                     <button
-                        onClick={handleClose}
+                        onClick={handleCloseDialog}
                         className="text-gray-500 hover:text-gray-700"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,7 +120,7 @@ export default function AddSocialDialog() {
                                     Remove Icon
                                 </button>
                             )}
-                        
+
                         </div>
                         <button
                             onClick={handleSave}

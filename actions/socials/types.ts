@@ -1,12 +1,18 @@
 import { ReturnType } from "@/lib/return-type";
-import { Social } from "@prisma/client";
+import { PlatformType, Social } from "@prisma/client";
 
-export type SocialType = {
-    id?: string;
-    platformId: string;
-    link: string;
-    position: number;
+export type SocialWithPlatform = Social & {
+    platform: {
+        type: PlatformType
+    }
 }
 
-export type ReturnTypeCreateSocial = ReturnType<SocialType, Social>
-export type ReturnTypeUpdateSocial = ReturnTypeCreateSocial
+export type CreateSocialParams = {
+    link: string;
+    position: number;
+    platformId: string;
+}
+
+export type UpdateSocialParams = CreateSocialParams & { id: string }
+
+export type ReturnTypeSocial = ReturnType<SocialWithPlatform>

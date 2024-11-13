@@ -1,138 +1,136 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react"
-import { SocialType } from "@/actions/socials/types"
+import { SocialWithPlatform } from "@/actions/socials/types"
 import { createSocial, deleteSocial, getSocialPlatforms, getSocials, updateSocial } from "@/actions/socials"
 import { toast } from "sonner"
-import { PlatformType } from "@prisma/client"
 import { SocialPlatform } from "@prisma/client"
 
 interface SocialContextType {
-    socials: SocialType[],
-    setSocials: Dispatch<SetStateAction<SocialType[]>>,
+    socials: SocialWithPlatform[],
+    setSocials: Dispatch<SetStateAction<SocialWithPlatform[]>>,
     maxPosition: number,
     setMaxPosition: Dispatch<SetStateAction<number>>,
-    socialToEdit: SocialType | null,
-    setSocialToEdit: Dispatch<SetStateAction<SocialType | null>>,
+    socialToEdit: SocialWithPlatform | null,
+    setSocialToEdit: Dispatch<SetStateAction<SocialWithPlatform | null>>,
     showAddSocialDialog: boolean,
     setShowAddSocialDialog: Dispatch<SetStateAction<boolean>>,
     handleSave: (link: string, platformId: string) => void,
     handleDelete: (id: string) => void,
-    handleClose: () => void,
-    handleTap: (social: SocialType) => void,
-    socialData: Array<SocialType & { platformName: PlatformType }>,
-    setSocialData: Dispatch<SetStateAction<Array<SocialType & { platformName: PlatformType }>>>
+    handleCloseDialog: () => void,
+    handleEdit: (social: SocialWithPlatform) => void,
+    handleAddSocial: () => void,
+    handleBack: () => void,
+    handleAddOrEditSocial: (platform: SocialPlatform, isEdit: boolean) => void,
     socialPlatforms: SocialPlatform[],
     setSocialPlatforms: Dispatch<SetStateAction<SocialPlatform[]>>,
     selectedPlatform: SocialPlatform | null,
     setSelectedPlatform: Dispatch<SetStateAction<SocialPlatform | null>>,
-    existingSocials: SocialType[],
-    setExistingSocials: Dispatch<SetStateAction<SocialType[]>>
 }
 
 export const SocialContext = createContext<SocialContextType | undefined>(undefined)
 
 export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [socials, setSocials] = useState<SocialType[]>([])
+    const [socials, setSocials] = useState<SocialWithPlatform[]>([])
     const [maxPosition, setMaxPosition] = useState<number>(0)
-    const [socialToEdit, setSocialToEdit] = useState<SocialType | null>(null)
+    const [socialToEdit, setSocialToEdit] = useState<SocialWithPlatform | null>(null)
     const [showAddSocialDialog, setShowAddSocialDialog] = useState(false)
-    const [socialData, setSocialData] = useState<Array<SocialType & { platformName: PlatformType }>>([])
     const [socialPlatforms, setSocialPlatforms] = useState<SocialPlatform[]>([])
     const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | null>(null)
-    const [existingSocials, setExistingSocials] = useState<SocialType[]>([])
+
+    const fetchSocials = async () => {
+        const { data, error } = await getSocials()
+
+        if (error) {
+            toast.error(error)
+            setSocials([])
+        } else {
+            setSocials(data?.socials || [])
+            setMaxPosition(data?.maxPosition || 0)
+        }
+    }
+
+    const fetchSocialPlatforms = async () => {
+        const { data, error } = await getSocialPlatforms()
+
+        if (error) {
+            toast.error(error)
+            setSocialPlatforms([])
+        } else {
+            setSocialPlatforms(data as SocialPlatform[])
+        }
+    }
 
     useEffect(() => {
-        const fetchSocialData = async () => {
-            const data = await Promise.all(socials.map(async (social) => {
-                const platform = await getSocialPlatforms(social.platformId) as SocialPlatform
-                return { ...social, platformName: platform.type }
-            }))
-            setSocialData(data)
-        }
-
-        fetchSocialData()
-    }, [socials])
-
-    useEffect(() => {
-        const fetchSocials = async () => {
-            const { socials, maxPosition } = await getSocials()
-            setSocials(socials)
-            setMaxPosition(maxPosition)
-        }
-
         fetchSocials()
-    }, [])
-
-    useEffect(() => {
-        const fetchSocialPlatforms = async () => {
-            const platforms = await getSocialPlatforms() as SocialPlatform[]
-            setSocialPlatforms(platforms)
-        }
-
-        const fetchSelectedPlatform = async () => {
-            if (socialToEdit) {
-                const platform = await getSocialPlatforms(socialToEdit.platformId) as SocialPlatform
-                setSelectedPlatform(platform)
-            }
-        }
-
-        const fetchExistingSocials = async () => {
-            const { socials } = await getSocials()
-            setExistingSocials(socials)
-        }
-
-        if (socialToEdit) {
-            fetchSelectedPlatform()
-        }
         fetchSocialPlatforms()
-        fetchExistingSocials()
     }, [])
 
     const handleSave = async (link: string, platformId: string) => {
-        const res = socialToEdit ?
+        const { data, error } = socialToEdit ?
             await updateSocial({
                 ...socialToEdit,
                 link,
             }) :
             await createSocial({ link, platformId, position: maxPosition + 1 })
 
-        if (!res.error && res.data) {
+        if (!error && data) {
             if (socialToEdit) {
-                setSocials(socials.map((social) => social.id === socialToEdit.id ? res.data! : social))
+                setSocials(socials.map((social) => social.id === socialToEdit.id ? data : social))
                 setSocialToEdit(null)
                 toast.success('Social updated')
             } else {
-                setSocials([...socials, res.data])
+                setSocials([...socials, data])
                 setMaxPosition(maxPosition + 1)
                 toast.success('Social created')
             }
             setShowAddSocialDialog(false)
         } else {
-            toast.error(res.error)
+            toast.error(error)
         }
     }
 
     const handleDelete = async (id: string) => {
-        const res = await deleteSocial(id)
-        if (res) {
+        const { data, error } = await deleteSocial(id)
+
+        if (!error && data) {
             setSocials(socials.filter((social) => social.id !== id))
-            toast.success('Social deleted')
             setSocialToEdit(null)
             setShowAddSocialDialog(false)
+            toast.success('Social deleted')
         } else {
-            toast.error('Failed deleting social')
+            toast.error('Delete failed')
         }
     }
 
-    const handleClose = () => {
+    const handleCloseDialog = () => {
         setShowAddSocialDialog(false)
         setSocialToEdit(null)
+        setSelectedPlatform(null)
     }
 
-    const handleTap = (social: SocialType) => {
+    const handleEdit = (social: SocialWithPlatform) => {
         setSocialToEdit(social)
+        setSelectedPlatform(socialPlatforms.find(platform => platform.id === social.platformId) || null)
         setShowAddSocialDialog(true)
+    }
+
+    const handleAddSocial = () => {
+        setSelectedPlatform(null)
+        setSocialToEdit(null)
+        setShowAddSocialDialog(true)
+    }
+
+    const handleBack = () => {
+        setSocialToEdit(null)
+        setSelectedPlatform(null)
+    }
+
+    const handleAddOrEditSocial = (platform: SocialPlatform, isEdit: boolean) => {
+        setSelectedPlatform(platform)
+        if (isEdit) {
+            setSocialToEdit(socials.find(social => social.platformId == platform.id)!)
+        }
     }
 
     return (
@@ -147,16 +145,15 @@ export const SocialProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setShowAddSocialDialog,
             handleSave,
             handleDelete,
-            handleClose,
-            handleTap,
-            socialData,
-            setSocialData,
+            handleCloseDialog,
+            handleEdit,
+            handleAddSocial,
+            handleBack,
+            handleAddOrEditSocial,
             socialPlatforms,
             setSocialPlatforms,
             selectedPlatform,
             setSelectedPlatform,
-            existingSocials,
-            setExistingSocials
         }}>
             {children}
         </SocialContext.Provider>

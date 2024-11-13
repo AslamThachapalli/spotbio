@@ -1,12 +1,18 @@
 'use server'
 
 import db from "@/client/db";
-import { ReturnTypeCreateSocial, ReturnTypeUpdateSocial, SocialType } from "./types";
+import { 
+    CreateSocialParams, 
+    ReturnTypeSocial, 
+    SocialWithPlatform, 
+    UpdateSocialParams 
+} from "./types";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { SocialPlatform } from "@prisma/client";
+import {  SocialPlatform } from "@prisma/client";
+import { ReturnType } from "@/lib/return-type";
 
-export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | SocialPlatform[]> => {
+export const getSocialPlatforms = async (id?: string): Promise<ReturnType<SocialPlatform | SocialPlatform[]>> => {
     try {
 
         if (id) {
@@ -15,26 +21,38 @@ export const getSocialPlatforms = async (id?: string): Promise<SocialPlatform | 
                     id
                 }
             })
-            return socialPlatform!
+
+            if (!socialPlatform) {
+                return {
+                    error: "Social platform not found"
+                }
+            }
+
+            return {
+                data: socialPlatform
+            }
         }
 
         const socialPlatforms = await db.socialPlatform.findMany()
         
-        return socialPlatforms
+        return {
+            data: socialPlatforms
+        }
     } catch (e: any) {
         console.error('getSocialPlatforms error', e)
-        return []
+        return {
+            error: e.message || "Error fetching social platforms",
+        }
     }
 }
 
-export const getSocials = async (): Promise<{socials: SocialType[], maxPosition: number}> => {
+export const getSocials = async (): Promise<ReturnType<{socials: SocialWithPlatform[], maxPosition: number}>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
         if (!userId) {
             return {
-                socials: [],
-                maxPosition: 0
+                error: "Unauthorized"
             }
         }
 
@@ -42,48 +60,71 @@ export const getSocials = async (): Promise<{socials: SocialType[], maxPosition:
             where: {
                 userId
             },
+            include: {
+                platform: {
+                    select: {
+                        type: true
+                    }
+                }
+            },
             orderBy: {
                 position: 'asc'
             }
         })
 
         return {
-            socials,
-            maxPosition: socials.reduce((max, social) => Math.max(max, social.position), 0)
+            data: {
+                socials,
+                maxPosition: socials.reduce((max, social) => Math.max(max, social.position), 0)
+            }
         }
     } catch (e: any) {
         return {
-            socials: [],
-            maxPosition: 0
+            error: e.message || "Error fetching socials",
         }       
     }
 }
 
-export const getSocialsByUsername = async (username: string): Promise<{socials: SocialType[]}> => {
+export const getSocialsByUsername = async (username: string): Promise<ReturnType<{socials: SocialWithPlatform[]}>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
         })
 
         if (!user) {
-            return { socials: [] }
+            return {
+                error: "User not found"
+            }
         }
 
         const socials = await db.social.findMany({
             where: { userId: user.id },
+            include: {
+                platform: {
+                    select: {
+                        type: true
+                    }
+                }
+            },
             orderBy: {
                 position: 'asc'
             }
         })
 
-        return { socials }
+        return {
+            data: {
+                socials
+            }
+        }
     } catch (e: any) {
         console.error('getSocialsByUsername error', e)
-        return { socials: [] }
+        return {
+            error: e.message || "Error fetching socials",
+        }
     }
 }
 
-export const createSocial = async (social: SocialType): Promise<ReturnTypeCreateSocial> => {
+export const createSocial = async (social: CreateSocialParams): Promise<ReturnTypeSocial> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
@@ -96,7 +137,14 @@ export const createSocial = async (social: SocialType): Promise<ReturnTypeCreate
         const newSocial = await db.social.create({
             data: {
                 ...social,
-                userId,
+                userId
+            },
+            include: {
+                platform: {
+                    select: {
+                        type: true
+                    }
+                }
             }
         })
         return {
@@ -109,7 +157,7 @@ export const createSocial = async (social: SocialType): Promise<ReturnTypeCreate
     }
 }
 
-export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdateSocial> => {
+export const updateSocial = async (social: UpdateSocialParams): Promise<ReturnTypeSocial> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
@@ -127,8 +175,16 @@ export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdate
             data: {
                link: social.link,
                position: social.position,
+            },
+            include: {
+                platform: {
+                    select: {
+                        type: true
+                    }
+                }
             }
         })
+
         return {
             data: updatedSocial
         }
@@ -139,12 +195,15 @@ export const updateSocial = async (social: SocialType): Promise<ReturnTypeUpdate
     }
 }
 
-export const deleteSocial = async (id: string): Promise<boolean> => {
+export const deleteSocial = async (id: string): Promise<ReturnType<boolean>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
+
         if (!userId) {
-            false
+            return {
+                error: "Unauthorized"
+            }
         }
 
         await db.social.delete({
@@ -154,8 +213,12 @@ export const deleteSocial = async (id: string): Promise<boolean> => {
             }
         })
 
-        return true
+        return {
+            data: true
+        }
     } catch (e: any) {
-        return false
+        return {
+            error: e.message || "Error deleting social",
+        }
     }
 }
