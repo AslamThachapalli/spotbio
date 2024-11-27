@@ -4,14 +4,12 @@ import { SocialProvider } from "@/contexts/SocialsContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     return (
-        <>
-            <LinkProvider>
-                <SocialProvider>
-                    <ProfileProvider>
-                        {children}
-                    </ProfileProvider>
-                </SocialProvider>
-            </LinkProvider>
-        </>
+        <LinkProvider>
+            <SocialProvider>
+                <ProfileProvider>
+                    {children}
+                </ProfileProvider>
+            </SocialProvider>
+        </LinkProvider>
     )
 }

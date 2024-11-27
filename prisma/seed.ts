@@ -10,7 +10,6 @@ const seedSocialPlatforms = async () => {
         { type: PlatformType.YOUTUBE },
         { type: PlatformType.TIKTOK },
         { type: PlatformType.WEBSITE },
-        { type: PlatformType.EMAIL },
         { type: PlatformType.FACEBOOK },
     ]
 

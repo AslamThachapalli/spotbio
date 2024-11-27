@@ -49,9 +49,10 @@ export const getProfileByUsername = async (username: string): Promise<ReturnType
     }
 }
 
-export const uploadAvatar = async (file: File): Promise<ReturnType<string>> => {
+export const uploadAvatar = async (file: File, userId: string): Promise<ReturnType<string>> => {
     try {
-        const storageRef = ref(storage, `spotbio/${file.name}`);
+        console.log('uploading avatar', process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
+        const storageRef = ref(storage, `spotbio/${userId}`);
         const uploadResult = await uploadBytes(storageRef, file);
 
         const url = await getDownloadURL(uploadResult.ref);
@@ -59,6 +60,7 @@ export const uploadAvatar = async (file: File): Promise<ReturnType<string>> => {
         return { data: url }
 
     } catch (e: any) {
+        console.log('uploadAvatar error', e)
         return { error: e.message || 'Failed to upload avatar' }
     }
 }
@@ -75,7 +77,7 @@ export const createProfile = async (formData: FormData): Promise<ReturnTypeProfi
         let avatarUrl: string
 
         if (formData.get('avatar')) {
-            const result = await uploadAvatar(formData.get('avatar') as File)
+            const result = await uploadAvatar(formData.get('avatar') as File, userId)
             if (!result.error) {
                 avatarUrl = result.data!
             } else {
@@ -112,7 +114,7 @@ export const updateProfile = async (formData: FormData): Promise<ReturnTypeProfi
         let avatarUrl: string | null = null
 
         if (formData.get('avatar')) {
-            const result = await uploadAvatar(formData.get('avatar') as File)
+            const result = await uploadAvatar(formData.get('avatar') as File, userId)
             if (!result.error) {
                 avatarUrl = result.data!
             } else {

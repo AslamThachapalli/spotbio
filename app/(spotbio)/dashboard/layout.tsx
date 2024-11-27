@@ -1,20 +1,23 @@
+'use client'
+
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import React from "react";
-import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import DashboardNavigator from "@/components/dashboard/DashboardNavigator";
 import HostedPreview from "@/components/dashboard/HostedPreview";
-import Providers from "./providers";
+import { useProfile } from "@/contexts/ProfileContext";
+import { useEffect } from "react";
 
-export default async function DashLayout({ children }: { children: React.ReactNode }) {
-    const session = await getServerSession()
+export default function DashLayout({ children }: { children: React.ReactNode }) {
+    const {isLoading, profile } = useProfile()
 
-    if (!session?.user) {
-        redirect('/')
-    }
+    useEffect(()=> {
+        if (!isLoading && !profile) {
+            redirect('/create-profile')
+        }
+    }, [profile, isLoading])
 
     return (
-        <Providers>
+        <>
             <div className="fixed top-0 z-10">
                 <DashboardHeader />
             </div>
@@ -22,7 +25,7 @@ export default async function DashLayout({ children }: { children: React.ReactNo
             <div className="flex">
                 <div className="sticky top-0 flex-[0.45] w-full h-screen bg-white">
                     <div className="h-full overflow-y-auto flex justify-center items-center">
-                        <HostedPreview username={session.user?.name!} />
+                        <HostedPreview />
                     </div>
                 </div>
 
@@ -33,6 +36,6 @@ export default async function DashLayout({ children }: { children: React.ReactNo
                     </div>
                 </div>
             </div>
-        </Providers>
+        </>
     )
 }

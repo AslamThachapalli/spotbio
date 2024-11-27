@@ -1,11 +1,13 @@
 'use client'
 
-import { createProfile, getProfile, updateProfile } from "@/actions/profile";
+import { getProfile, updateProfile } from "@/actions/profile";
 import { Profile } from "@prisma/client"
+import { useSession } from "next-auth/react";
 import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react"
 import { toast } from "sonner";
 
 interface ProfileContextType {
+    isLoading: boolean;
     profile: Profile | null;
     setProfile: Dispatch<SetStateAction<Profile | null>>;
     newAvatar: File | null;
@@ -18,15 +20,21 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined)
 export const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
     const [profile, setProfile] = useState<Profile | null>(null)
     const [newAvatar, setNewAvatar] = useState<File | null>(null)
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const session = useSession()
 
     const fetchProfile = async () => {
+        setIsLoading(true)
         const { data, error } = await getProfile();
 
         if (!error && data) {
             setProfile(data);
         } else {
+            setProfile(null);
             toast.error(error || 'Failed to fetch profile');
         }
+        setIsLoading(false)
     };
 
     useEffect(() => {
@@ -53,6 +61,7 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     }
 
     return <ProfileContext.Provider value={{
+        isLoading,
         profile,
         newAvatar,
         setNewAvatar,

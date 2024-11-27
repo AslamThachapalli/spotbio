@@ -7,4 +7,4 @@ export type UserType = {
     password: string,
 }
 
-export type ReturnTypeCreateUser = ReturnType<UserType, User>
+export type ReturnTypeCreateUser = ReturnType<User>

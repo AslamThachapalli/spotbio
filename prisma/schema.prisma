@@ -76,6 +76,5 @@ enum PlatformType {
   YOUTUBE
   TIKTOK
   WEBSITE
-  EMAIL
   FACEBOOK
 }

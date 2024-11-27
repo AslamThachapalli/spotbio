@@ -10,7 +10,8 @@ const config: Config = {
 	theme: {
 		extend: {
 			fontFamily: {
-				mulish: ['var(--font-mulish)']
+				mulish: ['var(--font-mulish)'],
+				bokor: ['var(--font-bokor)']
 			},
 			colors: {
 				background: 'var(--background)',

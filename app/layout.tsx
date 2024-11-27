@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mulish } from "next/font/google";
+import { Mulish, Bokor } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import Providers from "./providers";
@@ -7,6 +7,12 @@ import Providers from "./providers";
 const mulish = Mulish({
   subsets: ['latin'],
   variable: '--font-mulish',
+})
+
+const bokor = Bokor({
+  subsets: ['khmer'],
+  weight: ['400'],
+  variable: '--font-bokor',
 })
 
 export const metadata: Metadata = {
@@ -22,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body
-        className={`${mulish.variable} font-mulish antialiased`}
+        className={`${mulish.variable} ${bokor.variable} font-mulish antialiased`}
         suppressHydrationWarning={true}
       >
         <Providers>

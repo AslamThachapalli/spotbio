@@ -8,6 +8,6 @@ export type LinkType = {
     position: number
 }
 
-export type ReturnTypeCreateLink = ReturnType<LinkType, Link>
+export type ReturnTypeCreateLink = ReturnType<Link>
 
 export type ReturnTypeUpdateLink = ReturnTypeCreateLink
