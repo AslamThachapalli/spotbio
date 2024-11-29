@@ -16,7 +16,7 @@ export default function DashboardHeader() {
                 <div className="flex gap-4 items-center gap-x-4">
                     <a
                         className="text-blue-700 underline font-semibold flex items-center gap-x-1"
-                        href={`http://localhost:5173/${username}`}
+                        href={`https://spotbio.app/${username}`}
                         target="_blank"
                     >
                         {`spotbio.app/${username}`}
