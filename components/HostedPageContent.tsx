@@ -1,15 +1,14 @@
 import { getLinksByUsername } from "@/actions/links"
-import { LinkType } from "@/actions/links/types"
 import { getProfileByUsername } from "@/actions/profile"
 import { getSocialsByUsername } from "@/actions/socials"
 import { SocialWithPlatform } from "@/actions/socials/types"
 import SocialIcon from "@/components/SocialIcon"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-import { Profile } from "@prisma/client"
+import { Link as LinkType, Profile } from "@prisma/client"
 import Link from 'next/link'
 
-const fetchPageData = async (username: string): Promise<{ profile?: Profile, socials?: SocialWithPlatform[], links?: LinkType[], error?: string }> => {
+const fetchPageData = async (username: string): Promise<{ profile?: Profile | null, socials?: SocialWithPlatform[] | null, links?: LinkType[] | null, error?: string }> => {
     const { data: profile, error: profileError } = await getProfileByUsername(username)
     const { data: socials, error: socialsError } = await getSocialsByUsername(username)
     const { data: links, error: linksError } = await getLinksByUsername(username)
@@ -44,6 +43,14 @@ export async function HostedPageContent({ username, isPreview = false }: { usern
                         isPreview && "text-sm"
                     )}>{error}</p>
                 </div>
+            </div>
+        )
+    }
+
+    if (!profile || !socials || !links) {
+        return (
+            <div className="flex items-center justify-center space-x-2 h-screen">
+                <span className="text-slate-500 font-medium text-lg">Yaay! The username <span className="font-bold">{username}</span> is not claimed yet.</span>
             </div>
         )
     }

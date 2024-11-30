@@ -10,14 +10,14 @@ import { useRouter } from 'next/navigation';
 
 export default function CreateProfile() {
     const router = useRouter()
+    const { profile, setProfile } = useProfile();
+
     const [error, setError] = useState({ name: "", bio: "", avatar: "" });
     const [form, setForm] = useState<{ name: string, bio: string, avatar: File | null }>({ name: "", bio: "", avatar: null });
     const [isLoading, setIsLoading] = useState(false);
 
-    const { profile, setProfile } = useProfile();
-
     useEffect(() => {
-        if(profile){
+        if (profile) {
             router.push('/dashboard/links')
         }
     }, [profile])

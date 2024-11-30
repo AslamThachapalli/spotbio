@@ -7,6 +7,8 @@ import React, { useState } from "react"
 import { toast } from "sonner"
 
 function Signin() {
+    const router = useRouter()
+
     const [form, setForm] = useState({
         username: '',
         password: '',
@@ -15,7 +17,7 @@ function Signin() {
         usernameReq: false,
         passReq: false,
     })
-    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -53,6 +55,7 @@ function Signin() {
         }
         
         const toastId = toast.loading('Signing In...')
+        setIsLoading(true)
 
         const res = await signIn('credentials', {
             username: form.username,
@@ -77,6 +80,8 @@ function Signin() {
                 toast.error('oops something went wrong..!');
             }
         }
+
+        setIsLoading(false)
     }
 
     return (
@@ -119,9 +124,10 @@ function Signin() {
 
             <button
                 onClick={handleSubmit}
+                disabled={isLoading}
                 className="w-full bg-red-300 py-2 rounded-md mt-2 font-bold text-white uppercase tracking-wider"
             >
-                Submit
+                {isLoading ? 'Signing in...' : 'Submit'}
             </button>
         </div>
     );

@@ -2,7 +2,7 @@
 
 import db from '@/client/db'
 import bcrypt from 'bcrypt';
-import { ReturnTypeCreateUser, UserType } from './types'
+import { ReturnTypeCreateUser, CreateUserParams } from './types'
 
 export const isUsernameAvailable = async (username: string): Promise<boolean> => {
     const user = await db.user.findUnique({
@@ -16,7 +16,7 @@ export const isUsernameAvailable = async (username: string): Promise<boolean> =>
     return false
 }
 
-export const createUser = async (user: UserType): Promise<ReturnTypeCreateUser> => {
+export const createUser = async (user: CreateUserParams): Promise<ReturnTypeCreateUser> => {
     try {
         const hashedPass = await bcrypt.hash(user.password, 10)
 

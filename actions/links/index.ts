@@ -1,22 +1,19 @@
 'use server'
 
 import db from "@/client/db"
-import { LinkType, ReturnTypeCreateLink, ReturnTypeUpdateLink } from "./types"
+import { CreateOrUpdateLinkParams } from "./types"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { ReturnType } from "@/lib/return-type"
+import { Link } from "@prisma/client"
 
 
-export const getLinks = async (): Promise<ReturnType<{links: LinkType[], maxPosition: number}>> => {
+export const getLinks = async (): Promise<ReturnType<{links: Link[], maxPosition: number}>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         const links = await db.link.findMany({
             where: {
@@ -42,17 +39,13 @@ export const getLinks = async (): Promise<ReturnType<{links: LinkType[], maxPosi
     }
 }
 
-export const getLinksByUsername = async (username: string): Promise<ReturnType<LinkType[]>> => {
+export const getLinksByUsername = async (username: string): Promise<ReturnType<Link[] | null>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
         })
 
-        if (!user) {
-            return {
-                error: "User not found"
-            }
-        }
+        if (!user) return { data: null }
 
         const links = await db.link.findMany({
             where: { userId: user.id },
@@ -72,16 +65,12 @@ export const getLinksByUsername = async (username: string): Promise<ReturnType<L
     }
 }
 
-export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> => {
+export const createLink = async (link: CreateOrUpdateLinkParams): Promise<ReturnType<Link>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         const newLink = await db.link.create({
             data: {
@@ -101,7 +90,7 @@ export const createLink = async (link: LinkType): Promise<ReturnTypeCreateLink> 
     }
 }
 
-export const updateLink = async (link: LinkType): Promise<ReturnTypeUpdateLink> => {
+export const updateLink = async (link: CreateOrUpdateLinkParams): Promise<ReturnType<Link>> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id

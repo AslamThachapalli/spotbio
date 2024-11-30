@@ -6,15 +6,22 @@ import DashboardNavigator from "@/components/dashboard/DashboardNavigator";
 import HostedPreview from "@/components/dashboard/HostedPreview";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useEffect } from "react";
+import { Loader } from "lucide-react";
 
-export default function DashLayout({ children }: { children: React.ReactNode }) {
-    const {isLoading, profile } = useProfile()
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const { isLoading: isProfileLoading, profile } = useProfile()
 
-    useEffect(()=> {
-        if (!isLoading && !profile) {
+    useEffect(() => {
+        if (!isProfileLoading && !profile) {
             redirect('/create-profile')
         }
-    }, [profile, isLoading])
+    }, [profile, isProfileLoading])
+
+    if (isProfileLoading) {
+        return <div className="flex justify-center items-center h-screen">
+            <Loader className="animate-spin" />
+        </div>
+    }
 
     return (
         <>

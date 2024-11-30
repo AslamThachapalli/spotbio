@@ -22,27 +22,17 @@ export const getSocialPlatforms = async (id?: string): Promise<ReturnType<Social
                 }
             })
 
-            if (!socialPlatform) {
-                return {
-                    error: "Social platform not found"
-                }
-            }
+            if (!socialPlatform) return { error: "Social platform not found" }
 
-            return {
-                data: socialPlatform
-            }
+            return { data: socialPlatform }
         }
 
         const socialPlatforms = await db.socialPlatform.findMany()
         
-        return {
-            data: socialPlatforms
-        }
+        return { data: socialPlatforms }
     } catch (e: any) {
         console.error('getSocialPlatforms error', e)
-        return {
-            error: e.message || "Error fetching social platforms",
-        }
+        return { error: e.message || "Error fetching social platforms" }
     }
 }
 
@@ -50,11 +40,8 @@ export const getSocials = async (): Promise<ReturnType<{socials: SocialWithPlatf
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+
+        if (!userId) return { error: "Unauthorized" }
 
         const socials = await db.social.findMany({
             where: {
@@ -85,17 +72,13 @@ export const getSocials = async (): Promise<ReturnType<{socials: SocialWithPlatf
     }
 }
 
-export const getSocialsByUsername = async (username: string): Promise<ReturnType<SocialWithPlatform[]>> => {
+export const getSocialsByUsername = async (username: string): Promise<ReturnType<SocialWithPlatform[] | null>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
         })
 
-        if (!user) {
-            return {
-                error: "User not found"
-            }
-        }
+        if (!user) return { data: null }
 
         const socials = await db.social.findMany({
             where: { userId: user.id },
@@ -126,11 +109,9 @@ export const createSocial = async (social: CreateSocialParams): Promise<ReturnTy
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+
+        if (!userId) return { error: "Unauthorized" }
+
 
         const newSocial = await db.social.create({
             data: {
@@ -145,9 +126,7 @@ export const createSocial = async (social: CreateSocialParams): Promise<ReturnTy
                 }
             }
         })
-        return {
-            data: newSocial
-        }
+        return { data: newSocial }
     } catch (e: any) {
         return {
             error: e.message || "Error creating social",
@@ -159,11 +138,7 @@ export const updateSocial = async (social: UpdateSocialParams): Promise<ReturnTy
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         const updatedSocial = await db.social.update({
             where: {
@@ -183,13 +158,9 @@ export const updateSocial = async (social: UpdateSocialParams): Promise<ReturnTy
             }
         })
 
-        return {
-            data: updatedSocial
-        }
+        return { data: updatedSocial }
     } catch (e: any) {
-        return {
-            error: e.message || "Error updating social",
-        }
+        return { error: e.message || "Error updating social" }
     }
 }
 
@@ -198,11 +169,7 @@ export const deleteSocial = async (id: string): Promise<ReturnType<boolean>> => 
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return {
-                error: "Unauthorized"
-            }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         await db.social.delete({
             where: {
@@ -211,12 +178,8 @@ export const deleteSocial = async (id: string): Promise<ReturnType<boolean>> => 
             }
         })
 
-        return {
-            data: true
-        }
+        return { data: true }
     } catch (e: any) {
-        return {
-            error: e.message || "Error deleting social",
-        }
+        return { error: e.message || "Error deleting social" }
     }
 }

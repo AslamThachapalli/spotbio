@@ -2,7 +2,6 @@
 
 import { getProfile, updateProfile } from "@/actions/profile";
 import { Profile } from "@prisma/client"
-import { useSession } from "next-auth/react";
 import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react"
 import { toast } from "sonner";
 
@@ -21,8 +20,6 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
     const [profile, setProfile] = useState<Profile | null>(null)
     const [newAvatar, setNewAvatar] = useState<File | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    const session = useSession()
 
     const fetchProfile = async () => {
         setIsLoading(true)

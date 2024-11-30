@@ -8,15 +8,14 @@ import { getDownloadURL, uploadBytes } from "firebase/storage"
 import { ref } from "firebase/storage"
 import { storage } from "@/lib/firebase"
 import { ReturnType } from "@/lib/return-type"
+import { Profile } from "@prisma/client"
 
 export const getProfile = async (): Promise<ReturnTypeProfile> => {
     try {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return { error: "Unauthorized" }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         const profile = await db.profile.findUnique({
             where: { userId }
@@ -28,15 +27,13 @@ export const getProfile = async (): Promise<ReturnTypeProfile> => {
     }
 }
 
-export const getProfileByUsername = async (username: string): Promise<ReturnTypeProfile> => {
+export const getProfileByUsername = async (username: string): Promise<ReturnType<Profile | null>> => {
     try {
         const user = await db.user.findUnique({
             where: { username }
         })
 
-        if (!user) {
-            return { error: "User not found" }
-        }
+        if (!user) return { data: null }
 
         const profile = await db.profile.findUnique({
             where: { userId: user.id }
@@ -51,7 +48,6 @@ export const getProfileByUsername = async (username: string): Promise<ReturnType
 
 export const uploadAvatar = async (file: File, userId: string): Promise<ReturnType<string>> => {
     try {
-        console.log('uploading avatar', process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET)
         const storageRef = ref(storage, `spotbio/${userId}`);
         const uploadResult = await uploadBytes(storageRef, file);
 
@@ -70,9 +66,7 @@ export const createProfile = async (formData: FormData): Promise<ReturnTypeProfi
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return { error: "Unauthorized" }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         let avatarUrl: string
 
@@ -107,9 +101,7 @@ export const updateProfile = async (formData: FormData): Promise<ReturnTypeProfi
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return { error: "Unauthorized" }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         let avatarUrl: string | null = null
 
@@ -147,9 +139,7 @@ export const deleteProfile = async (): Promise<ReturnType<boolean>> => {
         const session = await getServerSession(authOptions)
         const userId = session?.user?.id
 
-        if (!userId) {
-            return { error: "Unauthorized" }
-        }
+        if (!userId) return { error: "Unauthorized" }
 
         await db.profile.delete({
             where: { userId }

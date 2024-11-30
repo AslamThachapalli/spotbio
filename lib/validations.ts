@@ -27,7 +27,7 @@ export const validatePassword = (password: string): InputValidationType => {
     } else if (password.length < 6) {
         return {
             isValid: false,
-            error: 'Atleast 6 letters required'
+            error: 'Atleast 6 characters required'
         }
     } else {
         return {

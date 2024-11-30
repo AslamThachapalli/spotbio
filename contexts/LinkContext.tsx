@@ -1,31 +1,31 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react"
-import { LinkType } from "@/actions/links/types"
+import { CreateOrUpdateLinkParams } from "@/actions/links/types"
 import { createLink, deleteLink, getLinks, updateLink } from "@/actions/links"
 import { toast } from "sonner"
 
 interface LinkContextType {
-    links: LinkType[],
-    setLinks: Dispatch<SetStateAction<LinkType[]>>,
+    links: CreateOrUpdateLinkParams[],
+    setLinks: Dispatch<SetStateAction<CreateOrUpdateLinkParams[]>>,
     maxPosition: number,
     setMaxPosition: Dispatch<SetStateAction<number>>,
-    linkToEdit: LinkType | null,
-    setLinkToEdit: Dispatch<SetStateAction<LinkType | null>>,
+    linkToEdit: CreateOrUpdateLinkParams | null,
+    setLinkToEdit: Dispatch<SetStateAction<CreateOrUpdateLinkParams | null>>,
     showAddLinkDialog: boolean,
     setShowAddLinkDialog: Dispatch<SetStateAction<boolean>>,
     handleSave: (title: string, link: string) => void,
     handleDelete: (id: string) => void,
     handleClose: () => void,
-    handleTap: (link: LinkType) => void,
+    handleTap: (link: CreateOrUpdateLinkParams) => void,
 }
 
 export const LinkContext = createContext<LinkContextType | undefined>(undefined)
 
 export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [links, setLinks] = useState<LinkType[]>([])
+    const [links, setLinks] = useState<CreateOrUpdateLinkParams[]>([])
     const [maxPosition, setMaxPosition] = useState<number>(0)
-    const [linkToEdit, setLinkToEdit] = useState<LinkType | null>(null)
+    const [linkToEdit, setLinkToEdit] = useState<CreateOrUpdateLinkParams | null>(null)
     const [showAddLinkDialog, setShowAddLinkDialog] = useState(false)
 
     useEffect(() => {
@@ -85,7 +85,7 @@ export const LinkProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLinkToEdit(null)
     }
 
-    const handleTap = (link: LinkType) => {
+    const handleTap = (link: CreateOrUpdateLinkParams) => {
         setLinkToEdit(link)
         setShowAddLinkDialog(true)
     }

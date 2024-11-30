@@ -11,6 +11,8 @@ import { FaEyeSlash } from "react-icons/fa";
 import { toast } from "sonner";
 
 function Signup() {
+    const router = useRouter()
+
     const [form, setForm] = useState({
         email: '',
         username: '',
@@ -22,17 +24,11 @@ function Signup() {
         pass: InputValidationType,
         username: InputValidationType,
     }>({
-        email: {
-            isValid: true,
-        },
-        pass: {
-            isValid: true,
-        },
-        username: {
-            isValid: true,
-        },
+        email: { isValid: true },
+        pass: { isValid: true },
+        username: { isValid: true },
     })
-    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -41,18 +37,14 @@ function Signup() {
             case ('email'): {
                 setInputValidation((prevState) => ({
                     ...prevState,
-                    email: {
-                        isValid: true,
-                    },
+                    email: { isValid: true },
                 }))
                 break;
             }
             case ('password'): {
                 setInputValidation((prevState) => ({
                     ...prevState,
-                    pass: {
-                        isValid: true,
-                    },
+                    pass: { isValid: true },
                 }))
                 break;
             }
@@ -69,9 +61,7 @@ function Signup() {
 
         setInputValidation((prevState) => ({
             ...prevState,
-            username: {
-                isValid: true
-            },
+            username: { isValid: true },
         }))
 
         setForm({
@@ -102,6 +92,7 @@ function Signup() {
         }
 
         const loadId = toast.loading('Signing up...')
+        setIsLoading(true)
 
         const res = await createUser(form);
 
@@ -119,6 +110,8 @@ function Signup() {
             toast.dismiss(loadId)
             toast.error(res.error)
         }
+
+        setIsLoading(false)
     }
 
     return (
@@ -190,8 +183,11 @@ function Signup() {
 
             <button
                 onClick={handleSubmit}
+                disabled={isLoading}
                 className="w-full bg-red-300 py-2 rounded-md mt-2 font-bold text-white uppercase tracking-wider"
-            >Submit</button>
+            >
+                {isLoading ? 'Signing up...' : 'Submit'}
+            </button>
         </div>
     );
 }
